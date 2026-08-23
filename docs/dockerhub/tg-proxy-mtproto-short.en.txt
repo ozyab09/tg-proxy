@@ -1,0 +1,1 @@
+Official Telegram MTProxy, built from the pinned commit f36d8af (x86_64).

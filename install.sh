@@ -92,7 +92,31 @@ install_docker() {
   elif command -v docker-compose >/dev/null 2>&1; then
     COMPOSE=(docker-compose)
   else
-    fail "Docker Compose plugin is missing (install docker-compose-plugin)."
+    log "Docker Compose plugin is missing — installing docker-compose-plugin"
+    if [[ "$DISTRO" == "debian" ]]; then
+      apt-get update -qq && apt-get install -y -qq docker-compose-plugin || true
+    else
+      dnf install -y docker-compose-plugin 2>/dev/null \
+        || yum install -y docker-compose-plugin || true
+    fi
+    if ! docker compose version >/dev/null 2>&1; then
+      # The package is unavailable (e.g. Docker installed from distro repos or
+      # a snap): install the standalone compose binary as a CLI plugin.
+      log "Package not available — installing standalone docker compose binary"
+      local dir="/usr/local/lib/docker/cli-plugins"
+      local version=""
+      mkdir -p "$dir"
+      version="$(curl -fsSL --max-time 20 https://api.github.com/repos/docker/compose/releases/latest \
+        | sed -n 's/.*"tag_name": *"\(v[^"]*\)".*/\1/p' | head -1)"
+      [[ -n "$version" ]] || fail "Could not determine the latest docker compose version."
+      curl -fsSL --max-time 120 \
+        "https://github.com/docker/compose/releases/download/${version}/docker-compose-linux-$(uname -m)" \
+        -o "$dir/docker-compose"
+      chmod +x "$dir/docker-compose"
+    fi
+    docker compose version >/dev/null 2>&1 \
+      || fail "Docker Compose is still unavailable after installation."
+    COMPOSE=(docker compose)
   fi
   log "Docker $(docker --version | awk '{print $3}')"
 }
@@ -314,12 +338,39 @@ obtain_certificate() {
     || warn "Relay health endpoint not responding yet; continuing."
 
   log "Requesting a Let's Encrypt certificate for $DOMAIN"
-  rm -rf "letsencrypt/live/$DOMAIN"   # remove placeholder so certbot issues fresh
-  local args=(certonly --webroot -w /var/www/certbot -d "$DOMAIN" --agree-tos --no-eff-email -n)
+  # Drop stale empty renewal configs left by failed attempts; otherwise
+  # `certbot renew` trips over an unparsable file every day.
+  find "letsencrypt/renewal" -maxdepth 1 -type f -name "${DOMAIN}*.conf" -size -20c -delete 2>/dev/null || true
+  # The placeholder is deliberately NOT removed first: if issuance fails,
+  # nginx still has a cert to load and stays up instead of crash-looping.
+  # --force-renewal makes certbot replace the self-signed placeholder in place.
+  local args=(certonly --webroot -w /var/www/certbot -d "$DOMAIN" --force-renewal --agree-tos --no-eff-email -n)
   if [[ -n "$EMAIL" ]]; then
     "${COMPOSE[@]}" --profile certbot run --rm certbot "${args[@]}" -m "$EMAIL"
   else
     "${COMPOSE[@]}" --profile certbot run --rm certbot "${args[@]}" --register-unsafely-without-email
+  fi
+  # If live/$DOMAIN already held the placeholder, certbot issues into a
+  # suffixed directory (live/$DOMAIN-0001). Point the canonical path at the
+  # issued certificate so nginx serves the real cert.
+  if ! openssl x509 -in "letsencrypt/live/$DOMAIN/fullchain.pem" -noout -issuer 2>/dev/null | grep -qi "lets encrypt"; then
+    local issued="" candidate="" base=""
+    for candidate in "letsencrypt/live/${DOMAIN}-"*; do
+      if [[ -e "$candidate/fullchain.pem" ]] \
+        && openssl x509 -in "$candidate/fullchain.pem" -noout -issuer 2>/dev/null | grep -qi "lets encrypt"; then
+        issued="$candidate"
+        break
+      fi
+    done
+    if [[ -n "$issued" ]]; then
+      base="$(basename "$issued")"
+      rm -f "letsencrypt/live/$DOMAIN/fullchain.pem" "letsencrypt/live/$DOMAIN/privkey.pem"
+      ln -s "../${base}/fullchain.pem" "letsencrypt/live/$DOMAIN/fullchain.pem"
+      ln -s "../${base}/privkey.pem" "letsencrypt/live/$DOMAIN/privkey.pem"
+      log "Linked issued certificate from live/${base}"
+    else
+      warn "Issuance did not produce a Let's Encrypt certificate; keeping the placeholder."
+    fi
   fi
   "${COMPOSE[@]}" exec nginx nginx -s reload
   log "Certificate issued"
@@ -374,6 +425,7 @@ summary() {
     https://t.me/webproxy?server=$DOMAIN&secret=$SECRET
 
   Files:      $INSTALL_DIR
+  Re-run:     cd $INSTALL_DIR && sudo ./install.sh
   Site:       replace $INSTALL_DIR/site/index.html, then:
                 cd $INSTALL_DIR && docker compose up -d --force-recreate relay
   Renewal:    systemd timer tg-proxy-certbot.timer (daily)
@@ -386,6 +438,12 @@ EOF
 
 main() {
   require_root
+  # When run as `curl ... | sudo bash`, stdin is the script itself, so the
+  # interactive prompts below would read the remaining script instead of the
+  # terminal. Restore the controlling terminal for user input.
+  if [[ ! -t 0 ]] && [[ -e /dev/tty ]]; then
+    exec </dev/tty
+  fi
   check_arch
   detect_distro
   check_ports
