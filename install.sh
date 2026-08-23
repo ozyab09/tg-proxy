@@ -198,6 +198,16 @@ generate_configs() {
   printf 'MTPROXY_SECRET=%s\n' "$SECRET" > .env
   chmod 600 .env
 
+  log "Writing connection.txt (chmod 600)"
+  cat > connection.txt <<EOF
+Hostname: $DOMAIN
+Secret:   $SECRET
+
+Telegram WEB proxy link for clients:
+  https://t.me/webproxy?server=$DOMAIN&secret=$SECRET
+EOF
+  chmod 600 connection.txt
+
   log "Writing config/config.json and config/profiles.json (chmod 0400)"
   cat > config/config.json <<EOF
 {
@@ -423,6 +433,7 @@ summary() {
 
   Telegram WEB proxy link for clients:
     https://t.me/webproxy?server=$DOMAIN&secret=$SECRET
+    (also saved to $INSTALL_DIR/connection.txt, chmod 600)
 
   Files:      $INSTALL_DIR
   Re-run:     cd $INSTALL_DIR && sudo ./install.sh
