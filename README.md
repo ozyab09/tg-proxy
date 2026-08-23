@@ -18,7 +18,10 @@ Docker-развёртывание [tproxy-server](https://github.com/telegramdes
 
 - сервер **x86_64** с публичным IPv4: Ubuntu/Debian (apt) или CentOS/RHEL (dnf/yum);
 - root или `sudo`;
-- свободные TCP 80/443;
+- свободные TCP 80/443 **и открытые порты 80/443 в фаерволe провайдера**
+  (security group / сетевые правила хостинга). Без этого Let's Encrypt не
+  выпустит сертификат — проверка: `nc -vz -w 3 <IP-сервера> 80` с другого
+  компьютера должна успешно подключаться;
 - домен с A-записью на сервер — или используйте `<IP>.sslip.io` (без DNS-настройки).
 
 ## Быстрая установка
@@ -28,6 +31,23 @@ Docker-развёртывание [tproxy-server](https://github.com/telegramdes
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ozyab09/tg-proxy/main/install.sh | sudo bash
 ```
+
+Скрипт интерактивный: он спросит домен и MTProxy-секрет (команда `curl | bash`
+сама перенаправляет ввод на терминал, отвечать нужно прямо в консоли).
+Всё разворачивается в **`/opt/tg-proxy`** — там же лежат конфиги, сайт и
+`docker-compose.yml`.
+
+Альтернативный способ — скачать и запустить локально:
+
+```bash
+git clone --recursive https://github.com/ozyab09/tg-proxy /opt/tg-proxy
+cd /opt/tg-proxy
+sudo ./install.sh
+```
+
+Повторный запуск безопасен в обоих вариантах: домен, секрет, сайт и
+сертификат сохраняются. Для повторного запуска просто выполните
+`cd /opt/tg-proxy && sudo ./install.sh`.
 
 Скрипт:
 

@@ -1,0 +1,1 @@
+Go-релей WEB-прокси Telegram (tproxy-server): мультиплексирует WebView-транспорт в потоки официального MTProxy.

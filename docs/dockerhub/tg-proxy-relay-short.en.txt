@@ -1,0 +1,1 @@
+Go relay for the Telegram WEB proxy (tproxy-server): multiplexes the WebView transport into streams for the official MTProxy.
