@@ -1,0 +1,10 @@
+# Generated at install time by install.sh
+/.env
+/config/
+/site/
+/letsencrypt/
+/certbot-webroot/
+/mtproxy-data/
+/nginx/tproxy.conf
+
+.DS_Store

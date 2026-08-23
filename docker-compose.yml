@@ -1,0 +1,78 @@
+# tg-proxy stack.
+#
+# All services use host networking: the relay only accepts requests whose TCP
+# peer is loopback and only listens on 127.0.0.1, so nginx proxies to it over
+# the host loopback. MTProxy binds 0.0.0.0:2398/8888; install.sh adds firewall
+# rules that drop those ports on every non-loopback interface (the provider
+# firewall remains the first boundary).
+#
+# Run `docker compose up -d` from this directory. install.sh prepares the
+# config/, site/, letsencrypt/, certbot-webroot/ and mtproxy-data/ directories
+# and the .env file first.
+
+services:
+  nginx:
+    image: nginx:1.30-alpine
+    container_name: tg-proxy-nginx
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/tproxy.conf:/etc/nginx/conf.d/tproxy.conf:ro
+      - ./letsencrypt:/etc/letsencrypt
+      - ./certbot-webroot:/var/www/certbot
+    healthcheck:
+      test: ["CMD-SHELL", "nginx -t"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  relay:
+    image: ozyab/tg-proxy-relay
+    build: .
+    container_name: tg-proxy-relay
+    network_mode: host
+    restart: unless-stopped
+    volumes:
+      - ./config/config.json:/etc/tproxy/config.json:ro
+      - ./config/profiles.json:/etc/tproxy/profiles.json:ro
+      - ./site:/srv/tproxy-site:ro
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8081/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  mtproxy:
+    image: ozyab/tg-proxy-mtproto
+    build: ./mtproxy
+    container_name: tg-proxy-mtproxy
+    network_mode: host
+    restart: unless-stopped
+    env_file:
+      - .env
+    command: >
+      -u mtproxy -p 8888 -H 2398 -S ${MTPROXY_SECRET}
+      --aes-pwd /etc/mtproxy/proxy-secret
+      /etc/mtproxy/proxy-multi.conf
+      -M 1 -C 4096
+    volumes:
+      - ./mtproxy-data:/etc/mtproxy:ro
+    healthcheck:
+      # Stats on 8888 is loopback-only; fall back to a TCP connect on the
+      # client port when the stats server is not bound.
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8888/stats >/dev/null 2>&1 || bash -c 'exec 3<>/dev/tcp/127.0.0.1/2398'"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  # Not started by `docker compose up -d`; run explicitly with
+  # `docker compose --profile certbot run --rm certbot ...` (see install.sh).
+  certbot:
+    image: certbot/certbot
+    container_name: tg-proxy-certbot
+    profiles: ["certbot"]
+    network_mode: host
+    volumes:
+      - ./letsencrypt:/etc/letsencrypt
+      - ./certbot-webroot:/var/www/certbot

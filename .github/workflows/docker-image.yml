@@ -1,0 +1,82 @@
+name: Build and push Docker images
+
+# Tag policy:
+#   - push to main (an MR/PR was merged): build an image tagged with the
+#     commit hash (dev image);
+#   - pull_request: build an image tagged with the head commit hash;
+#   - tag v* (e.g. v1.0.1): build the version image AND update `latest`.
+# `latest` is therefore only moved by a tagged release.
+on:
+  push:
+    branches: ["main"]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  REGISTRY: docker.io
+  RELAY_IMAGE: ozyab/tg-proxy-relay
+  MTPROXY_IMAGE: ozyab/tg-proxy-mtproto
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout (with tproxy-server submodule)
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Compute tags
+        id: tags
+        run: |
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            # Tagged release: version image + latest
+            relay_tags="${{ env.RELAY_IMAGE }}:${GITHUB_REF_NAME}"
+            relay_tags+=$'\n'"${{ env.RELAY_IMAGE }}:latest"
+            mtproxy_tags="${{ env.MTPROXY_IMAGE }}:${GITHUB_REF_NAME}"
+            mtproxy_tags+=$'\n'"${{ env.MTPROXY_IMAGE }}:latest"
+          else
+            # Push to main (MR merged) or pull request: commit-hash image only
+            relay_tags="${{ env.RELAY_IMAGE }}:${GITHUB_SHA::12}"
+            mtproxy_tags="${{ env.MTPROXY_IMAGE }}:${GITHUB_SHA::12}"
+          fi
+          echo "relay_tags<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$relay_tags" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+          echo "mtproxy_tags<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$mtproxy_tags" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push relay image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: ${{ steps.tags.outputs.relay_tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push mtproxy image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: mtproxy/Dockerfile
+          push: true
+          tags: ${{ steps.tags.outputs.mtproxy_tags }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

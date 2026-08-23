@@ -1,0 +1,3 @@
+[submodule "tproxy-server"]
+	path = tproxy-server
+	url = https://github.com/telegramdesktop/tproxy-server.git
