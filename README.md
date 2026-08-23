@@ -58,7 +58,7 @@ sudo ./install.sh
    (Enter — сгенерирует и покажет один раз);
 4. скачивает репозиторий (с субмодулем `tproxy-server`) в `/opt/tg-proxy`;
 5. генерирует `.env`, `config/config.json`, `config/profiles.json`
-   (chmod 0400), `nginx/tproxy.conf`;
+   (chmod 0400), `nginx/tproxy.conf` и `connection.txt` (chmod 600);
 6. скачивает официальные `proxy-secret` и `proxy-multi.conf` Telegram;
 7. настраивает фаервол: открывает 80/443, **закрывает 2398/8888 снаружи**
    (nftables на Debian/Ubuntu, firewalld на CentOS/RHEL);
@@ -76,10 +76,17 @@ Hostname: <ваш домен>
 Secret:   <32 hex-символа>
 ```
 
-Готовая ссылка (выводится в конце установки):
+Готовая ссылка (выводится в конце установки и сохраняется в
+`/opt/tg-proxy/connection.txt`, chmod 600):
 
 ```text
 https://t.me/webproxy?server=<домен>&secret=<секрет>
+```
+
+Ссылку можно посмотреть в любой момент:
+
+```bash
+cat /opt/tg-proxy/connection.txt
 ```
 
 ## Как это устроено
@@ -251,6 +258,7 @@ nc -vz -w 3 <SERVER_IP> 8888
 ├── site-starter/index.html   # стартовый сайт (одна страница)
 ├── docker-compose.yml
 ├── .env.example
+├── connection.txt            # ссылка для клиентов (создаётся install.sh, chmod 600)
 ├── install.sh                # установщик (скачивается с GitHub)
 ├── renew-cert.sh             # продление сертификата (systemd-таймер)
 ├── firewall.nft              # nftables: drop 2398/8888 снаружи
