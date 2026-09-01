@@ -190,6 +190,7 @@ image: ozyab/tg-proxy-relay:v1.0.1
 |---|---|
 | `DOCKERHUB_USERNAME` | ваш логин Docker Hub |
 | `DOCKERHUB_TOKEN` | access token (Account Settings → Security → New Access Token) |
+| `PAT_TOKEN` | Personal Access Token (scope `repo`) — нужен для триггера `docker-image.yml` при пуше тега из `release.yml` |
 
 Workflows:
 

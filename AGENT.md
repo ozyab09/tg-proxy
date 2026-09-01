@@ -103,8 +103,12 @@ Workflow в `.github/workflows/release.yml` — автоматический р�
 - создаёт тег `v*`, коммит с `CHANGELOG.md` и GitHub Release;
 - тег `v*` запускает `docker-image.yml`, который собирает релизные образы.
 
-Конфигурация cocogitto: `.cog.toml`. Если квалифицирующих коммитов нет —
+Конфигурация cocogitto: `cog.toml`. Если квалифицирующих коммитов нет —
 выход чистый, без создания тега.
+
+**Важно:** тег пушится через `PAT_TOKEN` (Personal Access Token с scope
+`repo`), иначе `docker-image.yml` не триггерится (ограничение `GITHUB_TOKEN`).
+Секрет `PAT_TOKEN` должен быть настроен в Settings → Secrets → Actions.
 
 Новую версию релея подхватывают обновлением субмодуля: `git -C tproxy-server
 fetch && git -C tproxy-server checkout <commit>` в корне — CI соберёт из него.

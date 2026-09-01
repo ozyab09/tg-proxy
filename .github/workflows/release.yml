@@ -65,7 +65,15 @@ jobs:
 
       - name: Push changelog commit and tag
         if: steps.bump.outputs.bumped == 'true'
-        run: git push origin main --tags
+        env:
+          # PAT is required so the tag push triggers docker-image.yml.
+          # GITHUB_TOKEN cannot trigger other workflows (GitHub security).
+          # Create a PAT with 'repo' scope and add it as repository secret
+          # PAT_TOKEN. Falls back to GITHUB_TOKEN if PAT_TOKEN is not set.
+          PAT: ${{ secrets.PAT_TOKEN || github.token }}
+        run: |
+          git remote set-url origin "https://x-access-token:${PAT}@github.com/${{ github.repository }}.git"
+          git push origin main --tags
 
       - name: Create GitHub Release
         if: steps.bump.outputs.bumped == 'true'
