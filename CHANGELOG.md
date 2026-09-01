@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 - - -
+## v1.5.3 - 2026-09-01
+#### Bug Fixes
+- (**ci**) lint - remove submodule path, relax yamllint - (7a76df3) - Vyacheslav Egorov
+
+- - -
+
 ## v1.5.2 - 2026-09-01
 #### Bug Fixes
 - (**ci**) use trivy-action with v prefix, relax yamllint - (299a6c3) - Vyacheslav Egorov
