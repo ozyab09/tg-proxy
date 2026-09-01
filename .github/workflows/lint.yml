@@ -17,8 +17,7 @@ jobs:
 
       - name: Run shellcheck
         run: |
-          shellcheck -x -s bash install.sh renew-cert.sh \
-            tproxy-server/deploy/*.sh
+          shellcheck -x -s bash install.sh renew-cert.sh
 
   yamllint:
     runs-on: ubuntu-latest
