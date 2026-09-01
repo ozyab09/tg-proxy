@@ -8,4 +8,20 @@
 /mtproxy-data/
 /nginx/tproxy.conf
 
+# IDE
 .DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Pre-commit
+.pre-commit-cache/
+
+# Trivy
+trivy-*.sarif

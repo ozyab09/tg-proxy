@@ -1,50 +1,70 @@
 # Security Policy
 
-## Поддерживаемые версии
+## Supported Versions
 
-Поддерживается последний релизный тег (`v*`). Dev-образы (`<sha12>` из PR и
-мёрджей в main) предназначены для тестирования и не считаются
-поддерживаемыми.
+| Version | Supported          |
+| ------- | ------------------ |
+| latest  | :white_check_mark: |
+| < latest | :x:                |
 
-## Сообщение об уязвимости
+Only the latest version receives security updates.
 
-Проект — развёртывание инфраструктуры Telegram-прокси: ошибки здесь могут
-затрагивать приватность пользователей. Пожалуйста, не создавайте публичный
-issue для уязвимостей.
+## Reporting a Vulnerability
 
-Как сообщить:
+If you discover a security vulnerability, please follow these steps:
 
-1. Откройте **Security → Report a vulnerability** (private security advisory)
-   в этом репозитории на GitHub;
-2. опишите проблему, затронутую версию (тег образа / коммит) и шаги
-   воспроизведения;
-3. по возможности предложите патч.
+### 1. Do NOT open a public issue
 
-Ответ ожидается в течение нескольких дней; до публичного раскрытия — минимум
-90 дней после выпуска исправления.
+Security vulnerabilities should be reported privately.
 
-## Что считается уязвимостью
+### 2. Contact the maintainers
 
-- обход проверки loopback-peer в релее или возможность подделать
-  `X-Forwarded-For`;
-- утечка capability моста или bearer-токенов (логирование URI/заголовков);
-- ошибки прав на секреты (`.env`, `config/profiles.json`);
-- открытие портов MTProxy (2398/8888) наружу;
-- уязвимости конфигурации nginx/Let's Encrypt, ведущие к компрометации
-  трафика.
+Send an email to the repository owner with:
 
-## Операционные требования безопасности
+- Description of the vulnerability
+- Steps to reproduce
+- Potential impact
+- Suggested fix (if any)
 
-При развёртывании (детали — в README и `install.sh`):
+### 3. Response timeline
 
-- открывать снаружи только TCP 80/443; **2398 и 8888 обязаны быть закрыты**
-  (MTProxy слушает `0.0.0.0`); firewall провайдера — первый рубеж,
-  nftables/firewalld на хосте — второй;
-- `config/profiles.json` — chmod 0400, владелец uid 10001; `.env` — chmod 600;
-- не включать логирование URI, query, заголовков и тел запросов: в query
-  моста живёт capability, в заголовках WebSocket — session bearer;
-- секрет MTProxy передаётся процессу аргументом `-S` — не давать посторонним
-  доступ к хосту;
-- стек работает в `network_mode: host` — не выставлять порты релея
-  (8080/8081) и MTProxy наружу;
-- только x86_64; обновляйте образы из релизных тегов, не из dev-хэшей.
+- **Acknowledgment**: within 48 hours
+- **Initial assessment**: within 1 week
+- **Fix release**: depends on severity
+
+## Security Measures
+
+### Infrastructure
+
+- Firewall blocks ports 2398/8888 externally (MTProxy internal only)
+- TLS encryption via Let's Encrypt certificates
+- Secrets stored in `.env` (chmod 600) and `config/profiles.json` (chmod 0400)
+- Relay accepts connections only from loopback interface
+
+### CI/CD
+
+- Trivy scanning for Docker image vulnerabilities
+- ShellCheck for shell script security issues
+- Private key detection in pre-commit hooks
+- Dependabot for automated dependency updates
+
+### Best Practices
+
+- Never log URI/query parameters (contain bridge capabilities)
+- Never log WebSocket headers (contain bearer tokens)
+- Use `access_log off` on nginx
+- Rotate MTProxy secret periodically
+- Monitor health endpoints for anomalies
+
+## Scope
+
+This security policy applies to:
+
+- The tg-proxy deployment scripts
+- Docker images published to Docker Hub
+- GitHub Actions workflows
+
+It does NOT apply to:
+
+- The upstream tproxy-server (report to [telegramdesktop/tproxy-server](https://github.com/telegramdesktop/tproxy-server))
+- The upstream MTProxy (report to [TelegramMessenger/MTProxy](https://github.com/TelegramMessenger/MTProxy))

@@ -278,17 +278,25 @@ nc -vz -w 3 <SERVER_IP> 8888
 │   └── tproxy.conf.tmpl      # шаблон vhost (__DOMAIN__ → install.sh)
 ├── site-starter/index.html   # стартовый сайт (одна страница)
 ├── docker-compose.yml
-├── .cog.toml                 # cocogitto: conventional commits + версионирование
+├── cog.toml                  # cocogitto: conventional commits + версионирование
 ├── .env.example
 ├── connection.txt            # ссылка для клиентов (создаётся install.sh, chmod 600)
 ├── install.sh                # установщик (скачивается с GitHub)
 ├── renew-cert.sh             # продление сертификата (systemd-таймер)
 ├── firewall.nft              # nftables: drop 2398/8888 снаружи
 ├── deploy/tg-proxy-firewall.service
-├── CHANGELOG.md              # автогенерация через cocogitto
-└── .github/workflows/
-    ├── docker-image.yml      # сборка образов Docker Hub
-    └── release.yml           # автосборка релиза + тег + GitHub Release
+├── CHANGELOG.md              # автогенерация через cocогitto
+├── Makefile                  # команды разработки (make help)
+├── CONTRIBUTING.md           # инструкции для контрибьюторов
+├── SECURITY.md               # политика безопасности
+├── .pre-commit-config.yaml   # pre-commit hooks
+└── .github/
+    ├── dependabot.yml        # автообновление зависимостей
+    └── workflows/
+        ├── docker-image.yml  # сборка образов Docker Hub
+        ├── release.yml       # автосборка релиза + тег + GitHub Release
+        ├── lint.yml          # shellcheck + yamllint
+        └── trivy.yml         # сканирование образов на уязвимости
 ```
 
 Подробности протокола и архитектуры — в `tproxy-server/PROTOCOL.md` и

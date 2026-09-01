@@ -26,6 +26,14 @@
 | `site-starter/index.html` | стартовый сайт (одна страница, без внешних ресурсов) |
 | `firewall.nft`, `deploy/tg-proxy-firewall.service` | фаервол |
 | `.github/workflows/docker-image.yml` | CI: сборка и push в Docker Hub |
+| `.github/workflows/release.yml` | CI: автоматический релиз (cocogitto) |
+| `.github/workflows/lint.yml` | CI: shellcheck + yamllint |
+| `.github/workflows/trivy.yml` | CI: сканирование образов на уязвимости |
+| `.github/dependabot.yml` | автообновление зависимостей |
+| `.pre-commit-config.yaml` | pre-commit hooks |
+| `Makefile` | команды разработки |
+| `CONTRIBUTING.md` | инструкции для контрибьюторов |
+| `SECURITY.md` | политика безопасности |
 
 ## Критические инварианты (не нарушать)
 
@@ -63,6 +71,15 @@
 ## Сборка и проверка
 
 ```bash
+# Все команды через make (см. Makefile)
+make help              # список всех команд
+make lint              # shellcheck + yamllint
+make build             # сборка всех образов
+make test              # lint + smoke-test
+make setup             # установка pre-commit hooks
+make health            # проверка health-эндпоинтов
+
+# Или вручную:
 # релей (субмодуль)
 cd tproxy-server && go build ./... && go vet ./... && go test ./...
 
