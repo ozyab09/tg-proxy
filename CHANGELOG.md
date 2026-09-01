@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 - - -
+## v1.5.0 - 2026-09-01
+#### Features
+- (**ci**) add lint, trivy scanning, dependabot, pre-commit, Makefile, CONTRIBUTING, SECURITY - (3f5bbf8) - Vyacheslav Egorov
+
+- - -
+
 ## v1.4.0 - 2026-09-01
 #### Features
 - (**ci**) generate rich release body from CHANGELOG.md - (f4d6ff5) - Vyacheslav Egorov
