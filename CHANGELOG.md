@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 - - -
+## v1.5.2 - 2026-09-01
+#### Bug Fixes
+- (**ci**) use trivy-action with v prefix, relax yamllint - (299a6c3) - Vyacheslav Egorov
+
+- - -
+
 ## v1.5.1 - 2026-09-01
 #### Bug Fixes
 - (**ci**) update trivy-action to v0.36.0 - (f06d3de) - Vyacheslav Egorov
