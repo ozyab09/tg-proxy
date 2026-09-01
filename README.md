@@ -221,10 +221,16 @@ cd /opt/tg-proxy
 docker compose ps
 docker compose logs -f relay
 
+# проверка версии образов:
+docker compose images relay mtproxy
+
+# health-эндпоинты релея:
 curl -fsS http://127.0.0.1:8081/healthz
 curl -fsS http://127.0.0.1:8081/readyz
 curl -fsS http://127.0.0.1:8081/metrics
-curl -fsS http://127.0.0.1:8888/stats          # статистика MTProxy
+
+# статистика MTProxy:
+curl -fsS http://127.0.0.1:8888/stats
 
 # порты 2398/8888 должны быть недоступны снаружи:
 nc -vz -w 3 <SERVER_IP> 2398
