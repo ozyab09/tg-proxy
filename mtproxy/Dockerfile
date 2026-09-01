@@ -5,7 +5,7 @@
 # (f36d8af769ffaeac36978d38c2c0f6d1104c2137). Official MTProxy is x86_64-only;
 # this image must run on an x86_64 host.
 
-FROM ubuntu:24.04 AS build
+FROM ubuntu:26.04 AS build
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates git make gcc g++ libssl-dev zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
@@ -16,7 +16,7 @@ RUN git clone https://github.com/TelegramMessenger/MTProxy.git /MTProxy \
     && make -C /MTProxy -j"$(nproc)"
 RUN test -x /MTProxy/objs/bin/mtproto-proxy
 
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 RUN apt-get update && apt-get install -y --no-install-recommends \
         ca-certificates curl libssl3t64 zlib1g \
     && rm -rf /var/lib/apt/lists/* \
