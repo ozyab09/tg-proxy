@@ -95,6 +95,17 @@ Workflow в `.github/workflows/docker-image.yml`:
 - образы: `ozyab/tg-proxy-relay`, `ozyab/tg-proxy-mtproto`;
 - секреты CI: `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN`.
 
+Workflow в `.github/workflows/release.yml` — автоматический релиз через
+[cocogitto](https://docs.cocogitto.io) при пуше в `main`:
+
+- ковыряет коммиты после последнего тега, определяет bump по conventional
+  commits (`feat:` → minor, `fix:` → patch, `feat!:` → major);
+- создаёт тег `v*`, коммит с `CHANGELOG.md` и GitHub Release;
+- тег `v*` запускает `docker-image.yml`, который собирает релизные образы.
+
+Конфигурация cocogitto: `.cog.toml`. Если квалифицирующих коммитов нет —
+выход чистый, без создания тега.
+
 Новую версию релея подхватывают обновлением субмодуля: `git -C tproxy-server
 fetch && git -C tproxy-server checkout <commit>` в корне — CI соберёт из него.
 

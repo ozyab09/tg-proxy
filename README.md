@@ -139,18 +139,28 @@ cat /opt/tg-proxy/connection.txt
 
 ## Как выпустить новую версию
 
-1. Сделайте изменения, откройте PR, дождитесь мёрджа в `main` —
-   автоматически соберётся dev-образ с хэшем коммита
-   (`ozyab/tg-proxy-relay:<sha12>`).
-2. Когда готовы к релизу, создайте тег и запушьте его:
+Релизы создаются **автоматически** при пуше в `main` с использованием
+[cocogitto](https://docs.cocogitto.io) и conventional commits:
 
-   ```bash
-   git tag v1.0.1
-   git push origin v1.0.1
-   ```
+1. Сделайте изменения, используя conventional commits:
+   - `feat: описание` — минорный bump (новая функциональность);
+   - `fix: описание` — патч-баг (исправление бага);
+   - `feat!: описание` или `BREAKING CHANGE:` в body — мажорный bump.
+2. Откройте PR, дождитесь мёрджа в `main` — автоматически соберётся
+   dev-образ с хэшем коммита (`ozyab/tg-proxy-relay:<sha12>`).
+3. Workflow `release.yml` определит следующую версию, создаст тег `v*`,
+   обновит `CHANGELOG.md` и опубликует GitHub Release.
+4. Тег `v*` запустит `docker-image.yml`, который соберёт релизные образы
+   `ozyab/tg-proxy-relay:<версия>` + `latest` (и то же для `tg-proxy-mtproto`).
 
-   Workflow соберёт `ozyab/tg-proxy-relay:v1.0.1` + `latest` (и то же для
-   `tg-proxy-mtproto`).
+Если квалифицирующих коммитов (feat, fix, …) нет — релиз не создаётся.
+
+Ручное создание тега всё ещё доступно:
+
+```bash
+git tag v1.0.1
+git push origin v1.0.1
+```
 
 ## Обновление сервера
 
@@ -181,8 +191,12 @@ image: ozyab/tg-proxy-relay:v1.0.1
 | `DOCKERHUB_USERNAME` | ваш логин Docker Hub |
 | `DOCKERHUB_TOKEN` | access token (Account Settings → Security → New Access Token) |
 
-Workflow запускается на push в `main`, теги `v*` и вручную
-(workflow_dispatch).
+Workflows:
+
+| Workflow | Триггер | Описание |
+|---|---|---|
+| `docker-image.yml` | push `main`, тег `v*`, PR, `workflow_dispatch` | Сборка Docker-образов |
+| `release.yml` | push `main` | Автоматический релиз через cocogitto (conventional commits → semver тег + GitHub Release) |
 
 ## Замена сайта
 
@@ -257,13 +271,17 @@ nc -vz -w 3 <SERVER_IP> 8888
 │   └── tproxy.conf.tmpl      # шаблон vhost (__DOMAIN__ → install.sh)
 ├── site-starter/index.html   # стартовый сайт (одна страница)
 ├── docker-compose.yml
+├── .cog.toml                 # cocogitto: conventional commits + версионирование
 ├── .env.example
 ├── connection.txt            # ссылка для клиентов (создаётся install.sh, chmod 600)
 ├── install.sh                # установщик (скачивается с GitHub)
 ├── renew-cert.sh             # продление сертификата (systemd-таймер)
 ├── firewall.nft              # nftables: drop 2398/8888 снаружи
 ├── deploy/tg-proxy-firewall.service
-└── .github/workflows/docker-image.yml
+├── CHANGELOG.md              # автогенерация через cocogitto
+└── .github/workflows/
+    ├── docker-image.yml      # сборка образов Docker Hub
+    └── release.yml           # автосборка релиза + тег + GitHub Release
 ```
 
 Подробности протокола и архитектуры — в `tproxy-server/PROTOCOL.md` и
