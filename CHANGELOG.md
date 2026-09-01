@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 - - -
+## v1.2.2 - 2026-09-01
+#### Bug Fixes
+- (**ci**) use PAT_TOKEN to trigger docker-image.yml on tag push - (295504d) - Vyacheslav Egorov
+
+- - -
+
 ## v1.2.1 - 2026-09-01
 #### Bug Fixes
 - (**ci**) use from_latest_tag instead of removed latest field in cog.toml - (93962b0) - Vyacheslav Egorov
