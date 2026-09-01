@@ -94,6 +94,7 @@ install_docker() {
   else
     log "Docker Compose plugin is missing — installing docker-compose-plugin"
     if [[ "$DISTRO" == "debian" ]]; then
+      # shellcheck disable=SC2015
       apt-get update -qq && apt-get install -y -qq docker-compose-plugin || true
     else
       dnf install -y docker-compose-plugin 2>/dev/null \
