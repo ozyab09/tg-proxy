@@ -1,0 +1,6 @@
+branch_whitelist = ["main"]
+tag_prefix = "v"
+latest = true
+
+[changelog]
+path = "CHANGELOG.md"
