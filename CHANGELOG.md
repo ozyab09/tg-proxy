@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 - - -
+## v1.5.1 - 2026-09-01
+#### Bug Fixes
+- (**ci**) update trivy-action to v0.36.0 - (f06d3de) - Vyacheslav Egorov
+
+- - -
+
 ## v1.5.0 - 2026-09-01
 #### Features
 - (**ci**) add lint, trivy scanning, dependabot, pre-commit, Makefile, CONTRIBUTING, SECURITY - (3f5bbf8) - Vyacheslav Egorov
