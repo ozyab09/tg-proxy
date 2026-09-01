@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 - - -
+## v1.4.0 - 2026-09-01
+#### Features
+- (**ci**) generate rich release body from CHANGELOG.md - (f4d6ff5) - Vyacheslav Egorov
+
+- - -
+
 ## v1.3.0 - 2026-09-01
 #### Features
 - (**docs**) add version check command to management section - (f53ee38) - Vyacheslav Egorov
