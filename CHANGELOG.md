@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 - - -
+## v1.6.0 - 2026-09-01
+#### Features
+- (**ci**) add multi-arch builds, smoke test, templates, CODEOWNERS, stale bot, release drafter, labeler - (e8d1195) - Vyacheslav Egorov
+
+- - -
+
 ## v1.5.4 - 2026-09-01
 #### Bug Fixes
 - (**ci**) suppress shellcheck SC2015 in install.sh - (4945055) - Vyacheslav Egorov
