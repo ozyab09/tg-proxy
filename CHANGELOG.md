@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 - - -
+## v1.3.0 - 2026-09-01
+#### Features
+- (**docs**) add version check command to management section - (f53ee38) - Vyacheslav Egorov
+
+- - -
+
 ## v1.2.2 - 2026-09-01
 #### Bug Fixes
 - (**ci**) use PAT_TOKEN to trigger docker-image.yml on tag push - (295504d) - Vyacheslav Egorov
