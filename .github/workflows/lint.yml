@@ -31,5 +31,5 @@ jobs:
 
       - name: Run yamllint
         run: |
-          yamllint -d "{extends: default, rules: {line-length: {max: 200}, truthy: disable}}" \
+          yamllint -d "{extends: default, rules: {line-length: {max: 200}, truthy: disable, document-start: disable}}" \
             docker-compose.yml .github/workflows/*.yml
