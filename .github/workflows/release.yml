@@ -80,6 +80,34 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "${{ steps.bump.outputs.version }}" \
-            --title "${{ steps.bump.outputs.version }}" \
-            --generate-notes
+          TAG="${{ steps.bump.outputs.version }}"
+          SHA=$(git rev-parse --short HEAD)
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD~1 2>/dev/null || echo "")
+
+          # Extract changelog section for this version from CHANGELOG.md
+          # cocogitto formats entries as: ## vX.Y.Z - YYYY-MM-DD
+          NOTES=$(awk -v tag="$TAG" '
+            /^## / { found = (index($0, tag) > 0) }
+            found && /^- - -/ { exit }
+            found && /^## / && !index($0, tag) { exit }
+            found && /^## / { next }
+            found && NF > 0 { print }
+          ' CHANGELOG.md)
+
+          # Build release body
+          BODY=""
+          if [[ -n "$NOTES" ]]; then
+            BODY+="## What's Changed\n\n"
+            BODY+="${NOTES}\n\n"
+          fi
+          BODY+="**${TAG}** (${SHA})\n\n"
+          if [[ -n "$PREV_TAG" ]]; then
+            BODY+="[Full Changelog](${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/compare/${PREV_TAG}...${TAG})"
+          fi
+
+          # Write body to temp file to preserve newlines
+          echo -e "$BODY" > /tmp/release-body.md
+
+          gh release create "$TAG" \
+            --title "$TAG" \
+            --notes-file /tmp/release-body.md
