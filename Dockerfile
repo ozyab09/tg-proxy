@@ -5,7 +5,7 @@
 # build is reproducible: checkout with `submodules: recursive` and the commit
 # recorded in the parent repository is what gets compiled.
 
-FROM golang:1.26 AS build
+FROM golang:1.27 AS build
 WORKDIR /src
 COPY tproxy-server/ ./tproxy-server/
 WORKDIR /src/tproxy-server
