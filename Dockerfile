@@ -13,7 +13,7 @@ RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/tproxy-server ./cmd/tproxy-server
 
-FROM alpine:3.23
+FROM alpine:3.24
 RUN adduser -D -H -u 10001 tproxy
 COPY --from=build /out/tproxy-server /usr/local/bin/tproxy-server
 USER tproxy
