@@ -1,0 +1,46 @@
+name: Stale Issues and PRs
+
+on:
+  schedule:
+    # Run daily at 06:00 UTC
+    - cron: "0 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close stale issues and PRs
+        uses: actions/stale@v9
+        with:
+          # Issues
+          days-before-stale: 30
+          days-before-close: 7
+          stale-issue-label: "stale"
+          stale-issue-message: >
+            This issue has been automatically marked as stale because it has not had
+            recent activity. It will be closed in 7 days if no further activity occurs.
+          close-issue-message: >
+            This issue has been automatically closed due to inactivity. Feel free to
+            reopen if you believe this is still relevant.
+          exempt-issue-labels: "pinned,security,bug"
+
+          # PRs
+          days-before-pr-stale: 14
+          days-before-pr-close: 7
+          stale-pr-label: "stale"
+          stale-pr-message: >
+            This PR has been automatically marked as stale because it has not had
+            recent activity. It will be closed in 7 days if no further activity occurs.
+          close-pr-message: >
+            This PR has been automatically closed due to inactivity. Feel free to
+            reopen if you would like to continue working on this.
+          exempt-pr-labels: "pinned,security"
+
+          # Dependabot PRs - close faster
+          only-labels: ""
+          operations-per-run: 100

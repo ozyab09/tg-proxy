@@ -1,0 +1,20 @@
+# Default owner for everything
+* @ozyab09
+
+# Docker images
+Dockerfile @ozyab09
+mtproxy/Dockerfile @ozyab09
+
+# CI/CD
+.github/ @ozyab09
+
+# Installation
+install.sh @ozyab09
+renew-cert.sh @ozyab09
+
+# Configuration
+nginx/ @ozyab09
+docker-compose.yml @ozyab09
+
+# Documentation
+*.md @ozyab09

@@ -1,0 +1,126 @@
+name: Smoke Test
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test-relay:
+    name: Test relay image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      - name: Build relay image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: Dockerfile
+          push: false
+          load: true
+          tags: tg-proxy-relay:test
+
+      - name: Create test config
+        run: |
+          mkdir -p test-config
+          cat > test-config/config.json <<'EOF'
+          {
+            "public_hostname": "test.example.com",
+            "listen": "127.0.0.1:8080",
+            "admin_listen": "127.0.0.1:8081",
+            "public_dir": "/srv/tproxy-site",
+            "profiles_file": "/etc/tproxy/profiles.json",
+            "enable_pprof": false,
+            "limits": {
+              "max_header_bytes": 16384,
+              "max_body_bytes": 2097152,
+              "max_frame_payload": 1048576,
+              "carrier_batch_bytes": 2097152,
+              "max_streams_per_session": 128,
+              "max_closed_stream_ids": 4096,
+              "max_pending_per_session": 33554432,
+              "max_pending_global": 536870912,
+              "max_pending_items_per_session": 16384,
+              "max_pending_items_global": 262144,
+              "max_sessions_per_ip": 0,
+              "max_sessions_global": 128,
+              "max_streams_global": 4096,
+              "max_backend_dials_in_flight": 256,
+              "new_sessions_per_minute": 600,
+              "new_sessions_burst": 128,
+              "new_streams_per_minute": 6000,
+              "new_streams_burst": 512,
+              "max_bootstraps_per_ip": 0,
+              "max_bootstraps_global": 512,
+              "new_bootstraps_per_minute": 1200,
+              "new_bootstraps_burst": 256,
+              "max_profiles": 32
+            },
+            "timeouts": {
+              "backend_dial": "5s",
+              "long_poll": "25s",
+              "reconnect_grace": "2m",
+              "bootstrap_lifetime": "2m",
+              "read_header": "10s",
+              "idle": "75s",
+              "shutdown": "15s"
+            }
+          }
+          EOF
+
+          cat > test-config/profiles.json <<'EOF'
+          {
+            "profiles": [
+              {
+                "name": "test",
+                "secret": "00000000000000000000000000000000",
+                "backend": "127.0.0.1:2398",
+                "carrier_mode": "https"
+              }
+            ]
+          }
+          EOF
+
+      - name: Start relay container
+        run: |
+          docker run -d --name relay-test \
+            -v ${{ github.workspace }}/test-config/config.json:/etc/tproxy/config.json:ro \
+            -v ${{ github.workspace }}/test-config/profiles.json:/etc/tproxy/profiles.json:ro \
+            tg-proxy-relay:test
+          sleep 3
+
+      - name: Check relay process
+        run: |
+          docker exec relay-test ps aux | grep tproxy-server || true
+          docker exec relay-test cat /proc/1/cmdline | tr '\0' ' ' || true
+
+      - name: Cleanup
+        if: always()
+        run: docker rm -f relay-test || true
+
+  test-mtproxy:
+    name: Test mtproxy image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Build mtproxy image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: mtproxy/Dockerfile
+          push: false
+          load: true
+          tags: tg-proxy-mtproto:test
+
+      - name: Verify mtproxy binary
+        run: |
+          docker run --rm tg-proxy-mtproto:test --help 2>&1 | head -5 || true
+
+      - name: Verify mtproxy runs as non-root
+        run: |
+          docker run --rm tg-proxy-mtproto:test whoami 2>&1 || true

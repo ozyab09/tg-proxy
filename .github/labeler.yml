@@ -1,0 +1,43 @@
+# Labeler configuration for automatic PR labeling
+
+# Documentation
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '*.md'
+          - docs/**
+
+# CI/CD
+ci:
+  - changed-files:
+      - any-glob-to-any-file:
+          - .github/**
+
+# Docker
+docker:
+  - changed-files:
+      - any-glob-to-any-file:
+          - Dockerfile
+          - mtproxy/Dockerfile
+          - docker-compose.yml
+
+# Installation
+installation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - install.sh
+          - renew-cert.sh
+
+# Configuration
+configuration:
+  - changed-files:
+      - any-glob-to-any-file:
+          - nginx/**
+          - config/**
+
+# Security
+security:
+  - changed-files:
+      - any-glob-to-any-file:
+          - firewall.nft
+          - deploy/**
