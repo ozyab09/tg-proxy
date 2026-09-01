@@ -42,6 +42,7 @@ jobs:
           # v7.0.0+ uses x86_64-unknown-linux-musl/ (no version prefix)
           COG_BIN=$(find . -path '*/cog' -type f | head -1)
           sudo mv "${COG_BIN}" /usr/local/bin/
+          rm -rf x86_64-unknown-linux-musl/ cocogitto-*/
           cog --version
 
       - name: Configure git
