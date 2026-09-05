@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 
 - - -
+## v1.6.1 - 2026-09-05
+#### Bug Fixes
+- renew-cert.sh must run from the compose directory (#11) - (71e187f) - Vyacheslav Egorov, *root*
+
+- - -
+
 ## v1.6.0 - 2026-09-01
 #### Features
 - (**ci**) add multi-arch builds, smoke test, templates, CODEOWNERS, stale bot, release drafter, labeler - (e8d1195) - Vyacheslav Egorov
