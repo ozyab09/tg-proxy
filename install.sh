@@ -398,6 +398,7 @@ After=docker.service network-online.target
 [Service]
 Type=oneshot
 WorkingDirectory=$INSTALL_DIR
+Environment=TG_PROXY_DIR=$INSTALL_DIR
 ExecStart=/usr/local/bin/tg-proxy-renew-cert.sh
 EOF
   cat > /etc/systemd/system/tg-proxy-certbot.timer <<EOF
