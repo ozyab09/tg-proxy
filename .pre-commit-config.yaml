@@ -12,7 +12,7 @@ repos:
     rev: v1.35.1
     hooks:
       - id: yamllint
-        args: ["-d", "{extends: default, rules: {line-length: {max: 200}, truthy: disable}}"]
+        args: ["-d", "{extends: default, rules: {line-length: {max: 200}, truthy: disable, document-start: disable}}"]
 
   # Conventional commits
   - repo: https://github.com/compilerla/conventional-pre-commit

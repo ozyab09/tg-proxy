@@ -10,7 +10,7 @@
 `docker compose`, установка — `install.sh`.
 
 Код релея живёт в **субмодуле** `tproxy-server/` (закреплённый коммит
-`2873a08` репозитория `telegramdesktop/tproxy-server`). Правки в сам релей
+`52a5feb` репозитория `telegramdesktop/tproxy-server`). Правки в сам релей
 делаются в том репозитории, не здесь.
 
 ## Раскладка
