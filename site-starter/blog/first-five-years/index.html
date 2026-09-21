@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The First Five Years Are the Hardest — Dario Kaufmann</title>
+<meta name="description" content="Why most infrastructure blogs die after year two, and what it takes to keep writing after that.">
+<link rel="canonical" href="https://dario.kaufmann.dev/blog/first-five-years/">
+<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml">
+</head>
+<body>
+
+<header class="site-header">
+  <a class="brand" href="/">Dario Kaufmann</a>
+  <nav class="site-nav" aria-label="Main">
+    <a href="/">Home</a>
+    <a href="/blog/" aria-current="page">Blog</a>
+    <a href="/projects/">Projects</a>
+    <a href="/about/">About</a>
+    <a href="/now/">Now</a>
+  </nav>
+</header>
+
+<main>
+  <article>
+    <h1>The First Five Years Are the Hardest</h1>
+    <p class="article-meta">
+      <time datetime="2026-01-04">4 January 2026</time> ·
+      ~6 minutes · <a href="/blog/">blog</a>
+    </p>
+    <ul class="chips">
+      <li class="chip">writing</li>
+      <li class="chip">this site</li>
+      <li class="chip">longevity</li>
+    </ul>
+
+    <p>
+      This blog is seven years old this month, which makes it older than
+      three of the four jobs I have held while writing it. I checked the
+      archive before writing this: 2026 opens with 41 posts, of which 31
+      were written in the first two years. The decay curve of my output
+      matches the decay curve of nearly every infrastructure blog I
+      have loved, which is why I think I can name the causes.
+    </p>
+
+    <h2>Year one is free</h2>
+    <p>
+      Every long-running system, blogs included, spends its first year
+      cashing in accumulated expertise. You have years of incident
+      notes, strong opinions formed in email threads, and a backlog of
+      “someone should write this down.” The first thirty posts are a
+      withdrawal from that account, and it feels like income.
+    </p>
+    <p>
+      Year two is when the account runs dry and you discover whether
+      you have a system for generating new material or only a memory.
+      That is the year most blogs die, and not from laziness — from
+      having mistaken a stock for a flow.
+    </p>
+
+    <h2>Where the flow comes from, for me</h2>
+    <ul>
+      <li><strong>Operations itself.</strong> Every on-call shift, every
+          migration, every “why is this box at 100% disk” produces
+          either a post or a runbook. I have stopped pretending I know
+          in advance which.</li>
+      <li><strong>Answering the same question twice.</strong> The
+          second time, I write the URL instead. Half my posts started
+          as an email I had already written once.</li>
+      <li><strong>Revisiting old posts.</strong> The
+          <a href="/blog/cron-scheduling-gotchas/">cron post</a> exists
+          because a 2020 post of mine on the same topic had a wrong
+          section. Correcting your own archive is both content and
+          hygiene.</li>
+      <li><strong>The maintenance log.</strong> Three weeks of ordinary
+          upkeep became
+          <a href="/blog/three-weeks-of-maintaining/">a post</a> because
+          I had started keeping the log. Material is a systems problem,
+          not a talent problem.</li>
+    </ul>
+
+    <h2>What I got wrong for years</h2>
+    <p>
+      For the first three years I tried to write <em>launch-shaped</em>
+      posts: new tool adopted, benchmark, conclusions. Those get links.
+      They also age in dog years, and they train you to need news,
+      which a long-running infrastructure practice does not produce on
+      schedule. The posts people still email me about are the boring
+      ones — cron, backups, review checklists — because they describe
+      weather, not headlines.
+    </p>
+    <p>
+      The other mistake was treating the site as a publication instead
+      of a place. The <a href="/now/">now page</a>, the project pages
+      that admit retirement, the visible corrections: those do more for
+      trust than any post, because they show the site is inhabited. A
+      blog with a working <abbr title="Rich Site Summary">RSS</abbr>
+      feed and a current “now” page is more alive than most things
+      called platforms.
+    </p>
+
+    <h2>Practical notes for year three and beyond</h2>
+    <ol>
+      <li>Keep the publishing stack dumber than your enthusiasm. This
+          site is hand-written HTML on purpose: the friction ceiling is
+          low, and the maintenance cost rounds to zero. Every generator
+          migration I considered would have consumed a year of
+          momentum.</li>
+      <li>Schedule the boringness: one evening a month, in the
+          calendar, treating the blog like the cron job it is.</li>
+      <li>Let posts be wrong in public, and correct them visibly. An
+          archive with a correction history is worth more than an
+          archive that pretends to have been right.</li>
+      <li>Never break old URLs. The single longest-lived piece of
+          infrastructure on this site is a 2019 redirect rule, and it
+          has outlasted every framework I have evaluated since.</li>
+    </ol>
+
+    <h2>The actual point</h2>
+    <p>
+      Longevity is the only competitive advantage left on the
+      independent web. Search engines discount you, aggregators ignore
+      you, and none of it matters, because the readers who matter find
+      you the way you found the sites you trust: while searching for a
+      specific error message, at night, and staying. Everything on this
+      site is optimized for that reader. Seven years in, they are the
+      entire business model, and the first five years were the price
+      of admission.
+    </p>
+
+    <p class="footnote">
+      If you are reading this in year one of your own blog: the
+      falloff is not failure, it is the handover point between memory
+      and system. Build the system — a log, a queue of prompts, a
+      fixed hour — and year three is easier than year one.
+    </p>
+
+    <p class="post-footer-nav">
+      <a href="/blog/faking-signal-in-noisy-metrics/">Newest post →</a>
+    </p>
+  </article>
+</main>
+
+<footer class="site-footer">
+  <p>© 2019–2026 Dario Kaufmann. Built by hand; no framework was harmed.</p>
+  <p><a href="/">Home</a> · <a href="/blog/">Blog</a> · <a href="/feed.xml">RSS</a> · <a href="mailto:hello@dario.kaufmann.dev">hello@dario.kaufmann.dev</a></p>
+</footer>
+
+</body>
+</html>

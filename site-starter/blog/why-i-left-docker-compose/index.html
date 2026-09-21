@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Why I Left Docker Compose in Production — Dario Kaufmann</title>
+<meta name="description" content="Compose is excellent for development. Here is the checklist I use before trusting it in production.">
+<link rel="canonical" href="https://dario.kaufmann.dev/blog/why-i-left-docker-compose/">
+<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml">
+</head>
+<body>
+
+<header class="site-header">
+  <a class="brand" href="/">Dario Kaufmann</a>
+  <nav class="site-nav" aria-label="Main">
+    <a href="/">Home</a>
+    <a href="/blog/" aria-current="page">Blog</a>
+    <a href="/projects/">Projects</a>
+    <a href="/about/">About</a>
+    <a href="/now/">Now</a>
+  </nav>
+</header>
+
+<main>
+  <article>
+    <h1>Why I Left Docker Compose in Production</h1>
+    <p class="article-meta">
+      <time datetime="2026-02-14">14 February 2026</time> ·
+      ~8 minutes · <a href="/blog/">blog</a>
+    </p>
+    <ul class="chips">
+      <li class="chip">docker</li>
+      <li class="chip">operations</li>
+      <li class="chip">hosting</li>
+    </ul>
+
+    <p>
+      Title first, honesty second: I did not leave because Compose is
+      bad. I left because the things I run for years outlive the
+      assumptions Compose is built on, and the migration was cheaper
+      than the recurring tax. If your service is restarted weekly,
+      redeployed from CI, and staffed by more than one on-call rotation,
+      much of this will not apply to you. If you run a box for five
+      years and expect it to survive your own absence, read on.
+    </p>
+
+    <h2>What Compose is honest about</h2>
+    <p>
+      Compose describes a <em>desired state of containers on one
+      machine</em>. For development that is exactly the right scope, and
+      I use it daily for that. The trouble is that production on a
+      long-lived host is not a state problem. It is a history problem:
+      five years of upgrades, a kernel you did not choose, a certificate
+      workflow that predates you, and 3&nbsp;a.m. you, who did not write
+      the file and cannot remember which of the three similar services
+      matters.
+    </p>
+
+    <h2>The four taxes</h2>
+
+    <h3>1. The YAML is not the system</h3>
+    <p>
+      The compose file says what should run. It does not say how it got
+      there, what depends on what, or in which order things must come
+      back after a reboot. Mine accumulated a README, three “remember
+      to” shell scripts, and finally a Makefile that ran the compose
+      commands in the right order — at which point I had built a worse
+      unit file with extra steps. The system's real definition lived in
+      my head and in shell history, and shell history is not a runbook.
+    </p>
+
+    <h3>2. Restart semantics are shallower than they feel</h3>
+    <p>
+      <code>restart: unless-stopped</code> covers “the process died.”
+      It does not cover dependencies coming up out of order after a
+      host reboot, health checks gating readiness, or the difference
+      between “running” and “serving.” I have watched a stack come up
+      green on a Sunday morning and fail its first real request at
+      08:59 because a database was accepting TCP before it was
+      accepting queries. systemd solved this in 2014 with
+      <code>After=</code> and <code>ExecStartPre=</code>, and the units
+      are three lines each.
+    </p>
+
+    <h3>3. Upgrades couple to the Compose version</h3>
+    <p>
+      Every few years the compose file format or the plugin's behavior
+      shifts enough that the file needs reviewing. On a five-year box
+      that review lands during an unrelated emergency, because that is
+      when you finally run <code>docker compose up</code> after a long
+      gap. Native units have survived three OS upgrades of mine with
+      zero file changes. The distro's promise — stable interfaces for
+      years — is exactly what a long-lived server needs.
+    </p>
+
+    <h3>4. The escape hatch is always host networking</h3>
+    <p>
+      The final straw for me: one service needed host networking for
+      latency reasons, which silently broke the internal DNS
+      assumptions of the other three, which forced more host networking,
+      and so on. When half your services are in host mode, the network
+      isolation you were running Compose for exists mostly in the
+      file's feelings. Either commit to the container network or commit
+      to processes; the middle ground is the worst of both and the
+      hardest to debug.
+    </p>
+
+    <h2>What I run instead</h2>
+    <p>
+      For services that are one process each — which is most of them,
+      forever, honestly: plain systemd units, generated from a
+      template, with <code>DynamicUser=</code>, hardcoded
+      <code>Environment=</code> lines, and a
+      <code>Restart=on-failure</code>. The whole thing is reviewable in
+      one terminal window. For the two services that genuinely want a
+      container boundary, a container <em>under</em> systemd, not
+      beside it.
+    </p>
+    <p>
+      The checklist I now apply before letting Compose near production,
+      which is also the checklist that talked me out of it:
+    </p>
+    <ul>
+      <li>Does the deployment survive a full host reboot without a
+          human? Reboot it and find out, deliberately, not during an
+          outage.</li>
+      <li>Is there exactly one file that describes the running system,
+          and does it match reality? If reality needs a README, the
+          file is incomplete.</li>
+      <li>Can the next maintainer diagnose it with
+          <code>journalctl</code> alone at 3&nbsp;a.m.?</li>
+      <li>Does anything rely on container-internal DNS while running
+          in host mode? (If yes, stop here.)</li>
+      <li>Will the file still be valid after the next OS release? If
+          unknown, that is a no.</li>
+    </ul>
+
+    <h2>The part where I defend Compose anyway</h2>
+    <p>
+      Use it for development environments, for CI, for one-week hacks,
+      and for services on machines whose lifecycle is shorter than the
+      file's. Compose failing on a three-year horizon is not a design
+      flaw; three years is simply not its design target. The mistake
+      was mine: I used a development tool as an operations platform
+      because the first month was free. The bill arrives in year two,
+      always on a Sunday, always while you are traveling.
+    </p>
+
+    <p class="post-footer-nav">
+      Next: <a href="/blog/first-five-years/">The First Five Years Are the Hardest</a>.
+    </p>
+  </article>
+</main>
+
+<footer class="site-footer">
+  <p>© 2019–2026 Dario Kaufmann. Built by hand; no framework was harmed.</p>
+  <p><a href="/">Home</a> · <a href="/blog/">Blog</a> · <a href="/feed.xml">RSS</a> · <a href="mailto:hello@dario.kaufmann.dev">hello@dario.kaufmann.dev</a></p>
+</footer>
+
+</body>
+</html>

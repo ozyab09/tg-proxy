@@ -275,9 +275,11 @@ EOF
 
   umask 022
   if [[ ! -f site/index.html ]]; then
-    log "Installing the starter site (replace site/index.html with your own)"
-    cp site-starter/index.html site/index.html
-    chmod 0644 site/index.html
+    log "Installing the starter site (replace site/ with your own)"
+    mkdir -p site
+    cp -a site-starter/. site/
+    find site -type d -exec chmod 0755 {} +
+    find site -type f -exec chmod 0644 {} +
   fi
 }
 
@@ -439,7 +441,7 @@ summary() {
 
   Files:      $INSTALL_DIR
   Re-run:     cd $INSTALL_DIR && sudo ./install.sh
-  Site:       replace $INSTALL_DIR/site/index.html, then:
+  Site:       replace files in $INSTALL_DIR/site/, then:
                 cd $INSTALL_DIR && docker compose up -d --force-recreate relay
   Renewal:    systemd timer tg-proxy-certbot.timer (daily)
   Firewall:   TCP 80/443 open; 2398/8888 blocked externally.

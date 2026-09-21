@@ -209,11 +209,6 @@ cd /opt/tg-proxy
 docker compose up -d --force-recreate relay
 ```
 
-Важно: релей отдаёт публичные страницы с CSP `style-src 'self'` — inline
-`<style>` и `<script>` блокируются. Стартовый сайт (`site-starter/index.html`)
-сделан одной страницей без внешних ресурсов. Свой сайт можно делать обычным
-(несколько `.html`, `styles.css`), но без inline-стилей и внешних ресурсов.
-
 ## Управление и проверка
 
 ```bash
@@ -276,7 +271,7 @@ nc -vz -w 3 <SERVER_IP> 8888
 ├── nginx/
 │   ├── nginx.conf            # базовый конфиг (access_log off)
 │   └── tproxy.conf.tmpl      # шаблон vhost (__DOMAIN__ → install.sh)
-├── site-starter/index.html   # стартовый сайт (одна страница)
+├── site-starter/             # стартовый сайт (многостраничный, для копирования в site/)
 ├── docker-compose.yml
 ├── cog.toml                  # cocogitto: conventional commits + версионирование
 ├── .env.example

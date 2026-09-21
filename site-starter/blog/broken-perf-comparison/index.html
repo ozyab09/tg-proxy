@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>That Broken Performance Comparison — Dario Kaufmann</title>
+<meta name="description" content="A 4.3× speedup that evaporated. How the benchmark lied, and the checks I run now.">
+<link rel="canonical" href="https://dario.kaufmann.dev/blog/broken-perf-comparison/">
+<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml">
+</head>
+<body>
+
+<header class="site-header">
+  <a class="brand" href="/">Dario Kaufmann</a>
+  <nav class="site-nav" aria-label="Main">
+    <a href="/">Home</a>
+    <a href="/blog/" aria-current="page">Blog</a>
+    <a href="/projects/">Projects</a>
+    <a href="/about/">About</a>
+    <a href="/now/">Now</a>
+  </nav>
+</header>
+
+<main>
+  <article>
+    <h1>That Broken Performance Comparison</h1>
+    <p class="article-meta">
+      <time datetime="2026-04-07">7 April 2026</time> ·
+      ~7 minutes · <a href="/blog/">blog</a>
+    </p>
+    <ul class="chips">
+      <li class="chip">performance</li>
+      <li class="chip">benchmarking</li>
+    </ul>
+
+    <p>
+      Last year I published an internal write-up — it never left the
+      company, which is why I can be honest here — claiming a 4.3×
+      speedup for a batch job after a rewrite. The number was real. The
+      conclusion was wrong. Three months later, in production, the new
+      version was maybe 15% faster, on a good day, with a tailwind.
+    </p>
+    <p>
+      This post is the post-mortem of my own benchmark. Not because the
+      mistake was exotic — every part of it is a classic — but because I
+      made it with full knowledge of the classics, and the checklist I
+      use now is the actual useful artifact.
+    </p>
+
+    <h2>What went wrong, in order of embarrassment</h2>
+
+    <h3>1. The old version was cold, the new one was warm</h3>
+    <p>
+      The comparison ran the incumbent first and the rewrite second, in
+      the same process, on the same data. By the time the rewrite ran,
+      the page cache held the entire input, buffers were sized right,
+      and the JIT-equivalent (Go's runtime; insert your ecosystem's
+      equivalent) had profiled everything. I compared a warm engine
+      against a cold start and called the difference an improvement.
+    </p>
+
+    <h3>2. One machine, one run, one number</h3>
+    <p>
+      I ran it once. On the machine I had. Which was newer than the
+      fleet median and had, we later found, a NIC that the office Wi-Fi
+      loved more than the datacenter switches did. A single run has no
+      variance, so it produces no distrust, which is exactly what makes
+      it dangerous.
+    </p>
+
+    <h3>3. The dataset was the demo dataset</h3>
+    <p>
+      It was small, uniform, and fit in memory end to end. The production
+      input was 60× larger and had a long tail of pathological records
+      that the rewrite handled through a slower but safer path. The
+      benchmark measured the rewrite's happy path; production lived in
+      the tail.
+    </p>
+
+    <h3>4. I measured the wrong endpoint</h3>
+    <p>
+      The benchmark timed “processing complete.” The user-visible
+      requirement was “results available.” Those differ by the flush and
+      index-build phase, which the rewrite deferred and which, in
+      production, happened during the hour people actually read the
+      results. The old version front-loaded that cost invisibly. The new
+      version won the race that did not matter.
+    </p>
+
+    <h2>The checklist I use now</h2>
+    <ol>
+      <li><strong>Interleave and randomize run order.</strong> A/B/A/B,
+          not A/A then B/B. If warmup exists, warm up both or neither.</li>
+      <li><strong>Three machines minimum, fleet-typical hardware.</strong>
+          Report per-machine, not averaged; the spread is the finding.</li>
+      <li><strong>Report the distribution.</strong> Median and p95 of N
+          runs, plus the input variance. One number is a vibe.</li>
+      <li><strong>Two datasets: production-shaped and adversarial.</strong>
+          If the tail changes the ranking, the tail is the result.</li>
+      <li><strong>End-to-end user timing.</strong> Measure from the
+          boundary the user experiences, including flushes, fsyncs, and
+          index builds.</li>
+      <li><strong>Re-run the whole thing after a week.</strong> On the
+          real workload, in staging, with production's cron pattern. The
+          benchmark is a hypothesis; this is the experiment.</li>
+      <li><strong>Write the falsification line first.</strong> Before
+          running: “if the gain is under X%, we do not ship the
+          rewrite.” Deciding the line after seeing the numbers is how
+          4.3× gets published.</li>
+    </ol>
+
+    <h2>The uncomfortable part</h2>
+    <p>
+      The rewrite did ship, and it was fine — cleaner, testable, and 15%
+      faster, which over a year was worth it. But it would have shipped
+      on those grounds anyway. The 4.3× did not change the decision; it
+      changed the <em>story</em>, which is worse, because the story gets
+      repeated and the caveat does not. The people who heard “4.3×”
+      quote it still. The people who heard “15%, worth it” have, so far,
+      all remembered it correctly.
+    </p>
+    <p>
+      That is the real lesson: precision in benchmarks is not about the
+      number, it is about what the number will be allowed to justify
+      later. A benchmark you cannot defend is a rumor with a graph.
+    </p>
+
+    <p class="post-footer-nav">
+      Next: <a href="/blog/why-i-left-docker-compose/">Why I Left Docker Compose in Production</a>.
+    </p>
+  </article>
+</main>
+
+<footer class="site-footer">
+  <p>© 2019–2026 Dario Kaufmann. Built by hand; no framework was harmed.</p>
+  <p><a href="/">Home</a> · <a href="/blog/">Blog</a> · <a href="/feed.xml">RSS</a> · <a href="mailto:hello@dario.kaufmann.dev">hello@dario.kaufmann.dev</a></p>
+</footer>
+
+</body>
+</html>

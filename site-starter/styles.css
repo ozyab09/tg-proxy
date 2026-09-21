@@ -1,0 +1,386 @@
+/* dario.kaufmann.dev — hand-rolled, no framework, keep it boring */
+
+:root {
+  --bg: #faf9f7;
+  --text: #23282d;
+  --muted: #6e7681;
+  --faint: #9ea7b0;
+  --accent: #0e7490;
+  --accent-hover: #155e75;
+  --hairline: #e6e3de;
+  --code-bg: #f2f0ec;
+  --code-border: #e6e3de;
+  --chip-bg: #eef0f2;
+  --mark-bg: #fff3c4;
+  --max-width: 42rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14171a;
+    --text: #d3d9de;
+    --muted: #8b949e;
+    --faint: #6e7681;
+    --accent: #53b8d4;
+    --accent-hover: #7fd0e6;
+    --hairline: #2a3036;
+    --code-bg: #1b2024;
+    --code-border: #2a3036;
+    --chip-bg: #21272d;
+    --mark-bg: #4a3f1e;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0 auto;
+  padding: 0 1.25rem;
+  max-width: var(--max-width);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  color: var(--text);
+  background: var(--bg);
+}
+
+/* ---------- header / footer chrome ---------- */
+
+.site-header {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 1rem;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 1.4rem 0 1rem;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.site-header .brand {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  color: var(--text);
+}
+
+.site-header .brand:hover {
+  color: var(--accent);
+}
+
+.site-nav {
+  display: flex;
+  gap: 1.1rem;
+  font-size: 0.95rem;
+}
+
+.site-nav a {
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.site-nav a:hover {
+  color: var(--accent);
+}
+
+.site-nav a[aria-current="page"] {
+  color: var(--text);
+  border-bottom: 2px solid var(--accent);
+}
+
+.site-footer {
+  margin-top: 3rem;
+  padding: 1.2rem 0 2.2rem;
+  border-top: 1px solid var(--hairline);
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.site-footer p {
+  margin: 0.2rem 0;
+}
+
+/* ---------- generic content ---------- */
+
+main {
+  padding: 2rem 0 0;
+}
+
+h1,
+h2,
+h3 {
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  font-weight: 700;
+}
+
+h1 {
+  font-size: 1.9rem;
+  margin: 0 0 0.9rem;
+}
+
+h2 {
+  font-size: 1.3rem;
+  margin: 2.2rem 0 0.6rem;
+}
+
+h3 {
+  font-size: 1.05rem;
+  margin: 1.6rem 0 0.4rem;
+}
+
+p {
+  margin: 0 0 1rem;
+  overflow-wrap: break-word;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: var(--accent-hover);
+}
+
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+ul,
+ol {
+  padding-left: 1.4rem;
+}
+
+li {
+  margin: 0.25rem 0;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--hairline);
+  margin: 2.4rem 0;
+}
+
+blockquote {
+  margin: 1.2rem 0;
+  padding: 0.1rem 0 0.1rem 1.1rem;
+  border-left: 3px solid var(--accent);
+  color: var(--muted);
+}
+
+blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+strong {
+  font-weight: 650;
+}
+
+small {
+  color: var(--muted);
+}
+
+abbr[title] {
+  text-decoration: underline dotted;
+  cursor: help;
+}
+
+/* ---------- code ---------- */
+
+code,
+pre,
+kbd {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.855em;
+}
+
+:not(pre) > code {
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 4px;
+  padding: 0.08em 0.35em;
+}
+
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--code-border);
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  overflow-x: auto;
+  line-height: 1.5;
+}
+
+pre code {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-size: 1em;
+}
+
+kbd {
+  border: 1px solid var(--code-border);
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  padding: 0.05em 0.4em;
+  background: var(--code-bg);
+  font-size: 0.8em;
+}
+
+/* ---------- post list ---------- */
+
+.post-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.post-list li {
+  display: flex;
+  gap: 1rem;
+  align-items: baseline;
+  margin: 0.55rem 0;
+}
+
+.post-list time {
+  flex: 0 0 5.6rem;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.post-list a {
+  text-decoration: none;
+}
+
+.post-list a:hover {
+  text-decoration: underline;
+}
+
+.year-heading {
+  margin-top: 1.8rem;
+}
+
+.year-heading:first-of-type {
+  margin-top: 0.4rem;
+}
+
+/* ---------- article chrome ---------- */
+
+.article-meta {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 1.8rem;
+}
+
+.article-meta time {
+  color: inherit;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.4rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.chip {
+  background: var(--chip-bg);
+  border-radius: 999px;
+  padding: 0.05rem 0.7rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+  letter-spacing: 0.01em;
+}
+
+.post-footer-nav {
+  margin-top: 2.6rem;
+  font-size: 0.95rem;
+}
+
+.footnote {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.update-note {
+  border: 1px solid var(--code-border);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  margin: 1.4rem 0;
+  font-size: 0.92rem;
+  color: var(--muted);
+  background: var(--code-bg);
+}
+
+.update-note strong {
+  color: var(--text);
+}
+
+/* ---------- projects ---------- */
+
+.project {
+  margin: 1.8rem 0;
+}
+
+.project h3 {
+  margin: 0;
+}
+
+.project .project-meta {
+  color: var(--faint);
+  font-size: 0.85rem;
+}
+
+/* ---------- misc ---------- */
+
+.now-updated {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.rss-hint {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+::selection {
+  background: var(--mark-bg);
+}
+
+@media (max-width: 540px) {
+  .post-list li {
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .site-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media print {
+  .site-header,
+  .site-footer,
+  .post-footer-nav {
+    display: none;
+  }
+
+  body {
+    max-width: none;
+    font-size: 11pt;
+  }
+}
