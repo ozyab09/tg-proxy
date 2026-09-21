@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Faking Signal in Noisy Metrics — Dario Kaufmann</title>
+<meta name="description" content="Our dashboards were confidently wrong. On turning one vibe metric into three boring, honest ones.">
+<link rel="canonical" href="https://dario.kaufmann.dev/blog/faking-signal-in-noisy-metrics/">
+<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml">
+</head>
+<body>
+
+<header class="site-header">
+  <a class="brand" href="/">Dario Kaufmann</a>
+  <nav class="site-nav" aria-label="Main">
+    <a href="/">Home</a>
+    <a href="/blog/" aria-current="page">Blog</a>
+    <a href="/projects/">Projects</a>
+    <a href="/about/">About</a>
+    <a href="/now/">Now</a>
+  </nav>
+</header>
+
+<main>
+  <article>
+    <h1>Faking Signal in Noisy Metrics</h1>
+    <p class="article-meta">
+      <time datetime="2026-08-30">30 August 2026</time> ·
+      ~7 minutes · <a href="/blog/">blog</a>
+    </p>
+    <ul class="chips">
+      <li class="chip">observability</li>
+      <li class="chip">metrics</li>
+      <li class="chip">dashboards</li>
+    </ul>
+
+    <p>
+      For most of last year, the most-watched number on our team dashboard
+      was a metric that could not tell you anything. It was called
+      <em>pipeline health</em>, it was a weighted mash-up of four other
+      metrics, and it had exactly one property that mattered to its
+      audience: it turned red in a way that correlated with mornings when
+      people were already annoyed about something.
+    </p>
+    <p>
+      This is the story of how we killed it and replaced it with three
+      boring metrics that lie less. It is not a story about tooling. We
+      changed almost nothing about the tooling.
+    </p>
+
+    <h2>Where the mush came from</h2>
+    <p>
+      The composite was invented, sincerely, during an incident review.
+      The problem we had was real: four separate dashboards, no shared
+      sense of what <em>bad</em> looks like, and an on-call engineer who
+      had to eyeball all of them under stress. Someone said “we need one
+      number that just tells us if things are okay,” and the composite
+      was born.
+    </p>
+    <p>
+      The weights were chosen in that meeting. They were never revisited.
+      They could not be revisited, because nobody could reconstruct why
+      freshness got 0.4 and error rate got 0.3. The metric was a fossil
+      of one afternoon's opinions, and it had been promoted to
+      <em>the</em> truth.
+    </p>
+
+    <h2>What the composite hid</h2>
+    <p>
+      Composite metrics have a failure mode that I have not seen named
+      often enough: <strong>compensation</strong>. When two inputs move in
+      opposite directions, the average moves a little, or not at all, and
+      the alarm does not fire. We had at least two mornings where a
+      backlog was quietly doubling behind a green number, because
+      freshness (good: recent events were fresh) was canceling out volume
+      (bad: the recent events were the only ones moving).
+    </p>
+    <p>
+      The other thing it hid was <em>why</em>. When the number went red,
+      the first question was always “okay, but which component?” — which
+      meant going back to the four dashboards anyway, now in a worse mood.
+      A metric that requires a second investigation to interpret is not a
+      signal, it is a doorbell.
+    </p>
+
+    <h2>The replacement, and why it worked</h2>
+    <p>
+      We deleted <em>pipeline health</em> and put three plain metrics in
+      its place, each with one job:
+    </p>
+    <ol>
+      <li>
+        <strong>Lag in minutes, age of oldest unprocessed event.</strong>
+        Not a rate. An age. Ages are monotonically honest: if the oldest
+        event is 40 minutes old, that sentence is true no matter how the
+        fleet feels about itself.
+      </li>
+      <li>
+        <strong>Failure ratio per stage, windowed over 15 minutes.</strong>
+        Per stage, because a global ratio lets a healthy majority hide a
+        dead minority. We were already collecting the inputs; the change
+        was only refusing to sum them.
+      </li>
+      <li>
+        <strong>Throughput as a range, not a line.</strong> We plot the
+        p10–p90 band and alert when today's band sits outside last
+        Tuesday's band. Business is seasonal; a hard threshold on volume
+        was alerting every quiet Sunday.
+      </li>
+    </ol>
+    <p>
+      None of these are clever. That is the point. Each one answers a
+      question a human actually asks — <em>is anything stuck, what is
+      broken, is the shape wrong</em> — and each can be interrogated alone,
+      without dragging three others into the interpretation.
+    </p>
+
+    <h2>The part nobody argues with and everybody skips</h2>
+    <p>
+      When we decommissioned the composite, we also wrote down, next to
+      each new metric, the question it answers and the action its alert
+      triggers. That one paragraph has settled more arguments than the
+      metrics themselves. If you cannot write the sentence “when this
+      fires, we do X,” you have not designed an alert, you have designed
+      a mood.
+    </p>
+    <p>
+      The checklist we use now, for any proposed dashboard addition:
+    </p>
+    <ul>
+      <li>What question does this answer, in plain words?</li>
+      <li>What will a human <em>do</em> differently when it changes?</li>
+      <li>Can it be interpreted without reading a second panel?</li>
+      <li>Can two inputs cancel each other out inside it?</li>
+      <li>If it were removed tomorrow, who would notice, and how?</li>
+    </ul>
+
+    <h2>Postscript</h2>
+    <p>
+      The composite still exists, in one place: a weekly report nobody
+      has opened since March. Deleting it turned out to require a
+      decision about who owns the report, which turned out to require a
+      decision about whether the report's consumer still works here. The
+      metrics were the easy part. They usually are.
+    </p>
+
+    <p class="footnote">
+      If you have a composite metric you are fond of, do not delete it
+      because a stranger on the internet is smug about composites. Delete
+      it when you notice that its red mornings are the ones you had
+      already heard about by other means. That gap between “the metric
+      knew” and “you already knew” is the whole audit.
+    </p>
+
+    <p class="post-footer-nav">
+      Next: <a href="/blog/three-weeks-of-maintaining/">Three Weeks of Maintaining</a>.
+    </p>
+  </article>
+</main>
+
+<footer class="site-footer">
+  <p>© 2019–2026 Dario Kaufmann. Built by hand; no framework was harmed.</p>
+  <p><a href="/">Home</a> · <a href="/blog/">Blog</a> · <a href="/feed.xml">RSS</a> · <a href="mailto:hello@dario.kaufmann.dev">hello@dario.kaufmann.dev</a></p>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://dario.kaufmann.dev/blog/faking-signal-in-noisy-metrics/</loc>
+    <lastmod>2026-08-30</lastmod>
+  </url>
+  <url>
+    <loc>https://dario.kaufmann.dev/blog/three-weeks-of-maintaining/</loc>
+    <lastmod>2026-07-19</lastmod>
+  </url>
+  <url>
+    <loc>https://dario.kaufmann.dev/blog/cron-scheduling-gotchas/</loc>
+    <lastmod>2026-06-02</lastmod>
+  </url>
+  <url>
+    <loc>https://dario.kaufmann.dev/blog/boring-review-checklist/</loc>
+    <lastmod>2026-05-12</lastmod>
+  </url>
+  <url>
+    <loc>https://dario.kaufmann.dev/blog/broken-perf-comparison/</loc>
+    <lastmod>2026-04-07</lastmod>
+  </url>
+  <url>
+    <loc>https://dario.kaufmann.dev/blog/why-i-left-docker-compose/</loc>
+    <lastmod>2026-02-14</lastmod>
+  </url>
+  <url>
+    <loc>https://dario.kaufmann.dev/blog/first-five-years/</loc>
+    <lastmod>2026-01-04</lastmod>
+  </url>
+</urlset>

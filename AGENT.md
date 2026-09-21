@@ -23,7 +23,7 @@
 | `nginx/nginx.conf`, `nginx/tproxy.conf.tmpl` | конфиги nginx; шаблон заполняет install.sh (`__DOMAIN__`) |
 | `docker-compose.yml` | 3 сервиса + certbot под профилем |
 | `install.sh`, `renew-cert.sh` | установщик и продление сертификата |
-| `site-starter/index.html` | стартовый сайт (одна страница, без внешних ресурсов) |
+| `site-starter/` | стартовый сайт: многостраничный личный блог, внешний CSS, без JS/форм/инлайна |
 | `firewall.nft`, `deploy/tg-proxy-firewall.service` | фаервол |
 | `.github/workflows/docker-image.yml` | CI: сборка и push в Docker Hub |
 | `.github/workflows/release.yml` | CI: автоматический релиз (cocogitto) |
@@ -65,7 +65,8 @@
    `8888` по документации MTProxy — только loopback.
 7. **CSP публичного сайта**: релей отдаёт страницы с `style-src 'self'` —
    inline `<style>`/`<script>` в `site/` блокируются. Стартовый сайт использует
-   семантический HTML + inline SVG с presentation-атрибутами.
+   внешний `styles.css`, семантический HTML и SVG-favicon; JS, формы, inline
+   стили/скрипты и внешние (third-party) ресурсы не используются вовсе.
 8. **MTProxy — только x86_64.** install.sh проверяет `uname -m`.
 
 ## Сборка и проверка

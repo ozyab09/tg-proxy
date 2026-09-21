@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Dario Kaufmann</title>
+    <link>https://dario.kaufmann.dev/</link>
+    <description>Notes on infrastructure, self-hosting, and running small software for a long time.</description>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 30 Aug 2026 09:05:00 +0000</lastBuildDate>
+    <atom:link href="https://dario.kaufmann.dev/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Faking Signal in Noisy Metrics</title>
+      <link>https://dario.kaufmann.dev/blog/faking-signal-in-noisy-metrics/</link>
+      <guid isPermaLink="true">https://dario.kaufmann.dev/blog/faking-signal-in-noisy-metrics/</guid>
+      <pubDate>Sun, 30 Aug 2026 09:05:00 +0000</pubDate>
+      <description>Our dashboards were confidently wrong. On turning one vibe metric into three boring ones.</description>
+    </item>
+    <item>
+      <title>Three Weeks of Maintaining</title>
+      <link>https://dario.kaufmann.dev/blog/three-weeks-of-maintaining/</link>
+      <guid isPermaLink="true">https://dario.kaufmann.dev/blog/three-weeks-of-maintaining/</guid>
+      <pubDate>Sun, 19 Jul 2026 10:35:00 +0000</pubDate>
+      <description>What I actually did for three weeks of open-source maintenance. Spoiler: mostly reading.</description>
+    </item>
+    <item>
+      <title>Cron Scheduling Gotchas</title>
+      <link>https://dario.kaufmann.dev/blog/cron-scheduling-gotchas/</link>
+      <guid isPermaLink="true">https://dario.kaufmann.dev/blog/cron-scheduling-gotchas/</guid>
+      <pubDate>Tue, 02 Jun 2026 11:25:00 +0000</pubDate>
+      <description>DST skips, repeated hours, and the quiet migration path that keeps cron from lying to you.</description>
+    </item>
+    <item>
+      <title>A Boring Code Review Checklist</title>
+      <link>https://dario.kaufmann.dev/blog/boring-review-checklist/</link>
+      <guid isPermaLink="true">https://dario.kaufmann.dev/blog/boring-review-checklist/</guid>
+      <pubDate>Tue, 12 May 2026 10:10:00 +0000</pubDate>
+      <description>The ten questions I ask about every diff before I have an opinion about anything else.</description>
+    </item>
+    <item>
+      <title>That Broken Performance Comparison</title>
+      <link>https://dario.kaufmann.dev/blog/broken-perf-comparison/</link>
+      <guid isPermaLink="true">https://dario.kaufmann.dev/blog/broken-perf-comparison/</guid>
+      <pubDate>Tue, 07 Apr 2026 09:00:00 +0000</pubDate>
+      <description>A 4.3× speedup that evaporated. How the benchmark lied, and the checks I run now.</description>
+    </item>
+    <item>
+      <title>Why I Left Docker Compose in Production</title>
+      <link>https://dario.kaufmann.dev/blog/why-i-left-docker-compose/</link>
+      <guid isPermaLink="true">https://dario.kaufmann.dev/blog/why-i-left-docker-compose/</guid>
+      <pubDate>Sat, 14 Feb 2026 11:40:00 +0000</pubDate>
+      <description>Compose is excellent for development. Here is the checklist I use before trusting it in production.</description>
+    </item>
+    <item>
+      <title>The First Five Years Are the Hardest</title>
+      <link>https://dario.kaufmann.dev/blog/first-five-years/</link>
+      <guid isPermaLink="true">https://dario.kaufmann.dev/blog/first-five-years/</guid>
+      <pubDate>Sun, 04 Jan 2026 10:20:00 +0000</pubDate>
+      <description>Why most infrastructure blogs die after year two, and what it takes to keep writing after that.</description>
+    </item>
+  </channel>
+</rss>

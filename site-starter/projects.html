@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projects — Dario Kaufmann</title>
+<meta name="description" content="Software Dario Kaufmann maintains: log tidy, crontab doctor, and other small tools that stay small.">
+<link rel="canonical" href="https://dario.kaufmann.dev/projects/">
+<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml">
+</head>
+<body>
+
+<header class="site-header">
+  <a class="brand" href="/">Dario Kaufmann</a>
+  <nav class="site-nav" aria-label="Main">
+    <a href="/">Home</a>
+    <a href="/blog/">Blog</a>
+    <a href="/projects/" aria-current="page">Projects</a>
+    <a href="/about/">About</a>
+    <a href="/now/">Now</a>
+  </nav>
+</header>
+
+<main>
+
+  <h1>Projects</h1>
+  <p>
+    Small tools I maintain for myself and anyone with the same problems.
+    All of them are deliberately unfinished in the sense that they do one
+    thing and I have no roadmap for making them do eleven things.
+  </p>
+
+  <section class="project">
+    <h3><a href="https://github.com/dkaufmann82/logtidy">logtidy</a></h3>
+    <p class="project-meta">Rust · ~2.3k lines · MIT · 2021–</p>
+    <p>
+      Compresses and rotates logs on long-lived servers without a daemon
+      or config file. It grew out of a shared irritation with logrotate
+      configs that only half-work, and now runs on every machine I
+      administer, which is either an endorsement or a hostage situation.
+      Most requested feature remains “support Solaris”, which tells you
+      something about the user base.
+    </p>
+  </section>
+
+  <section class="project">
+    <h3><a href="https://github.com/dkaufmann82/crontab-doctor">crontab-doctor</a></h3>
+    <p class="project-meta">Go · ~900 lines · BSD-2-Clause · 2023–</p>
+    <p>
+      Lints crontabs for the classic traps: jobs that collide on the DST
+      skip, MAILTO pointing at a departed colleague, % signs that will be
+      eaten by the shell. Born from the research for
+      <a href="/blog/cron-scheduling-gotchas/">Cron Scheduling Gotchas</a>.
+      It has found real problems on every server it has been pointed at,
+      including mine.
+    </p>
+  </section>
+
+  <section class="project">
+    <h3><a href="https://github.com/dkaufmann82/pocket-archive">pocket-archive</a></h3>
+    <p class="project-meta">Python · ~600 lines · MIT · 2020–</p>
+    <p>
+      One-shot archiver for my own reading list: pulls bookmarks, saves
+      single-file HTML snapshots, writes a searchable index. I have no
+      plans to make it a service. There are enough services.
+    </p>
+  </section>
+
+  <section class="project">
+    <h3><a href="https://github.com/dkaufmann82/dotfiles">dotfiles</a></h3>
+    <p class="project-meta">Shell · small · public domain · 2014–</p>
+    <p>
+      The usual, kept boring on purpose: zsh, tmux, git, a dozen small
+      scripts. The interesting part is what I keep deleting: every alias
+      that automates something I did not understand yet.
+    </p>
+  </section>
+
+  <h2>Retired</h2>
+  <ul>
+    <li><strong>whatsup.yml</strong> (2019–2024) — a status-page generator
+        that was a worse version of two existing tools by the time I
+        admitted it. The README now just says “use those instead”.</li>
+    <li><strong>pgsplit</strong> (2017–2022) — Postgres table partitioner
+        for a job I no longer have. Archived with notes on what I would
+        do differently, which is: use declarative partitioning.</li>
+  </ul>
+
+  <h2>Colophon of this site</h2>
+  <p>
+    Hand-written HTML, one stylesheet, zero build steps. The source lives
+    in a git repository on the same mini-PC that serves it, and the
+    deploy process is <code>rsync</code> plus a full backup taken first.
+    See <a href="/about/">about</a> for the philosophy, or the
+    <a href="/blog/first-five-years/">five-years post</a> for why the
+    deploy process is so conservative.
+  </p>
+
+</main>
+
+<footer class="site-footer">
+  <p>© 2019–2026 Dario Kaufmann. Built by hand; no framework was harmed.</p>
+  <p><a href="/">Home</a> · <a href="/blog/">Blog</a> · <a href="/feed.xml">RSS</a> · <a href="mailto:hello@dario.kaufmann.dev">hello@dario.kaufmann.dev</a></p>
+</footer>
+
+</body>
+</html>

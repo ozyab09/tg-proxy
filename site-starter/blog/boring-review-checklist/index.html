@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A Boring Code Review Checklist — Dario Kaufmann</title>
+<meta name="description" content="The ten questions I ask about every diff before I have an opinion about anything else.">
+<link rel="canonical" href="https://dario.kaufmann.dev/blog/boring-review-checklist/">
+<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml">
+</head>
+<body>
+
+<header class="site-header">
+  <a class="brand" href="/">Dario Kaufmann</a>
+  <nav class="site-nav" aria-label="Main">
+    <a href="/">Home</a>
+    <a href="/blog/" aria-current="page">Blog</a>
+    <a href="/projects/">Projects</a>
+    <a href="/about/">About</a>
+    <a href="/now/">Now</a>
+  </nav>
+</header>
+
+<main>
+  <article>
+    <h1>A Boring Code Review Checklist</h1>
+    <p class="article-meta">
+      <time datetime="2026-05-12">12 May 2026</time> ·
+      ~5 minutes · <a href="/blog/">blog</a>
+    </p>
+    <ul class="chips">
+      <li class="chip">code review</li>
+      <li class="chip">process</li>
+    </ul>
+
+    <p>
+      When I review a pull request, I have learned to delay having
+      opinions about the interesting parts. Architecture, naming,
+      library choices — all of that is worth discussing, but only after
+      ten boring questions have been answered, because the boring
+      questions catch the failures that actually page people.
+    </p>
+
+    <h2>The ten questions</h2>
+    <ol>
+      <li>
+        <strong>What does this diff do when the network is down?</strong>
+        Any new outbound call is a future incident report. Timeouts,
+        retries with jitter, and a sane behavior on total failure must
+        be visible in the diff itself, not in the author's intentions.
+      </li>
+      <li>
+        <strong>What happens if it runs twice?</strong>
+        Idempotency is not just for cron. Queues redeliver, users
+        double-click, deploys replay. If running the code twice is
+        different from running it once, I want a comment saying why that
+        is safe.
+      </li>
+      <li>
+        <strong>What does it log?</strong>
+        No secrets, no personal data, no request identifiers that
+        correlate a user across services without a reason documented
+        next to them. I have spent more review hours on this question
+        than on any performance question in my career, and it has paid
+        better.
+      </li>
+      <li>
+        <strong>How does it fail under load?</strong>
+        Not “does it stay fast” — “what degrades first, and does it
+        degrade politely.” Unbounded queues, unbounded goroutines, and
+        caches without limits are the three usual suspects.
+      </li>
+      <li>
+        <strong>Is there a path back?</strong>
+        Can the change be reverted without ceremony? Migrations that
+        cannot be walked back are sometimes necessary; they are never
+        casual. The diff should show which kind this is.
+      </li>
+      <li>
+        <strong>Who gets paged?</strong>
+        If this breaks at 3&nbsp;a.m., does the alert route to someone
+        who can fix it, and does the runbook sentence exist yet? The
+        answer “we will add the runbook after launch” is how runbooks
+        never happen.
+      </li>
+      <li>
+        <strong>What does this make harder in the future?</strong>
+        Every change forecloses some other change. Not a reason to
+        refuse the diff — a reason to say out loud what is being
+        foreclosed, so the next person inherits a decision instead of a
+        mystery.
+      </li>
+      <li>
+        <strong>Is the new flag defaulting safely?</strong>
+        New behavior behind a default-off flag gets tested default-on
+        before merge, not the week of rollout. The flag that has never
+        been on is not a mitigation, it is a second untested code path.
+      </li>
+      <li>
+        <strong>Does the test read like documentation?</strong>
+        Test names that describe behavior, fixtures a stranger can
+        follow, and at least one test for the failure mode from
+        question one. Tests for the happy path alone are demos.
+      </li>
+      <li>
+        <strong>Would I understand this diff in a year?</strong>
+        Read the diff as if you had just been paged for it and it was
+        written by someone who has since left. Anything you have to
+        reconstruct from memory of the discussion is a future
+        archaeology project. Comment now, in the code.
+      </li>
+    </ol>
+
+    <h2>What this is not</h2>
+    <p>
+      This is not a style guide, and none of it is about correctness of
+      the algorithm. Compilers are good at algorithms; they are useless
+      at “this function will be called with the network partitioned
+      during a deploy.” The boring questions exist precisely because
+      they are the ones the machine cannot ask for you.
+    </p>
+    <p>
+      They are also deliberately cheap to answer. A diff that cannot
+      answer all ten quickly is not a bad diff — it is a diff whose
+      author and reviewer should have had a five-minute conversation
+      before the review, and still can.
+    </p>
+
+    <p class="post-footer-nav">
+      Next: <a href="/blog/broken-perf-comparison/">That Broken Performance Comparison</a>.
+    </p>
+  </article>
+</main>
+
+<footer class="site-footer">
+  <p>© 2019–2026 Dario Kaufmann. Built by hand; no framework was harmed.</p>
+  <p><a href="/">Home</a> · <a href="/blog/">Blog</a> · <a href="/feed.xml">RSS</a> · <a href="mailto:hello@dario.kaufmann.dev">hello@dario.kaufmann.dev</a></p>
+</footer>
+
+</body>
+</html>

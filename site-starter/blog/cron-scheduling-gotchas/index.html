@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cron Scheduling Gotchas — Dario Kaufmann</title>
+<meta name="description" content="DST skips, repeated hours, and the quiet migration path that keeps cron from lying to you.">
+<link rel="canonical" href="https://dario.kaufmann.dev/blog/cron-scheduling-gotchas/">
+<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml">
+</head>
+<body>
+
+<header class="site-header">
+  <a class="brand" href="/">Dario Kaufmann</a>
+  <nav class="site-nav" aria-label="Main">
+    <a href="/">Home</a>
+    <a href="/blog/" aria-current="page">Blog</a>
+    <a href="/projects/">Projects</a>
+    <a href="/about/">About</a>
+    <a href="/now/">Now</a>
+  </nav>
+</header>
+
+<main>
+  <article>
+    <h1>Cron Scheduling Gotchas</h1>
+    <p class="article-meta">
+      <time datetime="2026-06-02">2 June 2026</time> ·
+      ~8 minutes · <a href="/blog/">blog</a>
+    </p>
+    <ul class="chips">
+      <li class="chip">cron</li>
+      <li class="chip">scheduling</li>
+      <li class="chip">operations</li>
+    </ul>
+
+    <p>
+      Cron has been quietly running the world's unglamorous jobs for
+      forty years, and it will still be running them when today's
+      orchestrators are blog posts about orchestration. That longevity
+      breeds complacency: cron <em>feels</em> fully known. It is not.
+      Here are the scheduling behaviors that have bitten me or people
+      whose incident reports I have read, with the least painful
+      migration path for each.
+    </p>
+
+    <h2>1. The DST spring-forward hour does not exist</h2>
+    <p>
+      Jobs scheduled in 02:00–02:59 in a DST-observing timezone simply do
+      not run on the spring-forward night. Not delayed — skipped. Vixie
+      cron matches wall-clock times; if the wall clock jumps from 02:00
+      to 03:00, no minute of 02:xx occurs, so no job fires.
+    </p>
+    <p>
+      If the job matters — backups, certificate renewal, billing cutoff —
+      either schedule it outside the DST jump window (03:30 or later, or
+      better 04:00), or run the daemon with <code>CRON_TZ=UTC</code> and
+      express the schedule in UTC, where every hour occurs exactly once.
+    </p>
+
+    <h2>2. The fall-back hour runs twice</h2>
+    <p>
+      The mirror problem: on the autumn night, 02:30 happens twice, and
+      so does your job. Most of the time this is harmless. If the job is
+      not idempotent — an increment, a charge, a notification — it is an
+      incident that occurs once per year per job, always on a Sunday, at
+      a time chosen by a 19th-century railway convention.
+    </p>
+    <p>
+      This is the one class of bug that
+      <a href="/projects/">crontab-doctor</a> finds on nearly every server
+      it is pointed at: non-idempotent jobs with a minute field inside
+      02:00–02:59 in a local timezone. The fix is the same as above —
+      UTC, or idempotency, or both.
+    </p>
+
+    <h2>3. Day-of-month and day-of-week are OR'ed</h2>
+    <p>
+      The POSIX behavior that surprises everyone exactly once: if both
+      the day-of-month and day-of-week fields are <em>restricted</em>
+      (i.e., not <code>*</code>), the job runs when <strong>either</strong>
+      matches, not both. <code>0 0 13 * FRI</code> runs on every Friday
+      <em>and</em> on the 13th — not on Friday the 13th. This is
+      documented in the man page, four words at a time, in the section
+      nobody re-reads.
+    </p>
+
+    <h2>4. % is special in the command</h2>
+    <p>
+      In a crontab, the first unescaped <code>%</code> in the command
+      field ends the command and starts standard input. So
+      <code>date +%F</code> silently becomes <code>date +</code> with
+      <code>F</code> piped in. Escape it: <code>date +\%F</code>. Every
+      old crontab has one of these waiting. My tool checks for it, which
+      is how I know.
+    </p>
+
+    <h2>5. The environment is 1975-sized</h2>
+    <p>
+      Cron runs your job with a minimal environment: typically
+      <code>SHELL</code>, <code>PATH</code> equal to
+      <code>/usr/bin:/bin</code>, and a cwd of your home directory. No
+      <code>$HOME/.profile</code>, no systemd
+      <code>EnvironmentFile</code>, none of your shell convenience. Jobs
+      that work interactively and fail from cron are usually failing on
+      one of three things: PATH, a missing variable, or a relative path.
+      The debugging ritual that always finds it:
+    </p>
+    <pre><code># run the job in the same desert cron uses
+env -i SHELL=/bin/sh PATH=/usr/bin:/bin \
+  HOME=$HOME /bin/sh -c 'your command here'</code></pre>
+
+    <h2>The quiet migration path</h2>
+    <p>
+      If the above has convinced you to move scheduling off local time,
+      resist the rewrite. Cron files are the one thing every operator
+      can read; do not replace them with a system only your team can
+      read, in service of a problem you can fix with one line per file:
+    </p>
+    <pre><code># at the top of every crontab, from now on
+CRON_TZ=UTC
+
+# and translate existing entries once:
+#   old: 30 2 * * * /usr/local/bin/backup.sh   (Europe/Zurich)
+#   new: 30 0 * * * /usr/local/bin/backup.sh   (UTC, same instant)</code></pre>
+    <p>
+      Verify the translation with a one-shot dry run on a test box by
+      faking the clock, or at minimum by comparing
+      <code>date -d "02:30 tomorrow Europe/Zurich" -u</code> against the
+      new minute field. Write the old wall-clock time in a comment —
+      future you reading the file during an incident thinks in wall
+      clock, not in UTC offsets, and the comment is the only translation
+      table that will be at hand.
+    </p>
+
+    <h2>When you have outgrown cron</h2>
+    <p>
+      You have not outgrown cron because it lacks features. You have
+      outgrown it when you need these, and only these: dependency
+      ordering between jobs, retries with backoff, or jobs that must not
+      overlap themselves. Until then, cron plus a locking wrapper
+      (<code>flock</code> is in your base system already) is the boring,
+      correct answer. The day you genuinely need the other three
+      features, choose a scheduler on its scheduling merits — not because
+      a conference talk told you cron is dead. Cron attended that talk.
+      Cron will outlive it.
+    </p>
+
+    <p class="post-footer-nav">
+      Next: <a href="/blog/boring-review-checklist/">A Boring Code Review Checklist</a>.
+    </p>
+  </article>
+</main>
+
+<footer class="site-footer">
+  <p>© 2019–2026 Dario Kaufmann. Built by hand; no framework was harmed.</p>
+  <p><a href="/">Home</a> · <a href="/blog/">Blog</a> · <a href="/feed.xml">RSS</a> · <a href="mailto:hello@dario.kaufmann.dev">hello@dario.kaufmann.dev</a></p>
+</footer>
+
+</body>
+</html>

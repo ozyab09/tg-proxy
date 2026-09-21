@@ -1,0 +1,5 @@
+# dario.kaufmann.dev
+User-agent: *
+Allow: /
+
+Sitemap: https://dario.kaufmann.dev/sitemap.xml

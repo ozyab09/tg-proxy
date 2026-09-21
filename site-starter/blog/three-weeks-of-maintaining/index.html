@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Three Weeks of Maintaining — Dario Kaufmann</title>
+<meta name="description" content="What I actually did for three weeks of open-source maintenance. Spoiler: mostly reading.">
+<link rel="canonical" href="https://dario.kaufmann.dev/blog/three-weeks-of-maintaining/">
+<link rel="stylesheet" href="/styles.css">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate" type="application/rss+xml" title="RSS" href="/feed.xml">
+</head>
+<body>
+
+<header class="site-header">
+  <a class="brand" href="/">Dario Kaufmann</a>
+  <nav class="site-nav" aria-label="Main">
+    <a href="/">Home</a>
+    <a href="/blog/" aria-current="page">Blog</a>
+    <a href="/projects/">Projects</a>
+    <a href="/about/">About</a>
+    <a href="/now/">Now</a>
+  </nav>
+</header>
+
+<main>
+  <article>
+    <h1>Three Weeks of Maintaining</h1>
+    <p class="article-meta">
+      <time datetime="2026-07-19">19 July 2026</time> ·
+      ~6 minutes · <a href="/blog/">blog</a>
+    </p>
+    <ul class="chips">
+      <li class="chip">open source</li>
+      <li class="chip">maintenance</li>
+    </ul>
+
+    <p>
+      I kept a log for three weeks of maintaining
+      <a href="/projects/">my small tools</a>, because I suspected my
+      answer to “how is the side project going” was boring in a dishonest
+      way. I would say things like “mostly triage,” which is both true
+      and completely uninformative. Here is what the log actually says.
+    </p>
+
+    <h2>The ledger</h2>
+    <p>Roughly 21 hours total, across three projects. Where it went:</p>
+    <ul>
+      <li><strong>9 hours reading.</strong> Issues, PRs, logs, other
+          people's crontabs, the bug I was sure was in my code being
+          reproducible in an upstream library's changelog from 2023.</li>
+      <li><strong>5 hours writing.</strong> Docs, release notes, two
+          README sections that answer questions I had answered in email
+          three times each.</li>
+      <li><strong>4 hours talking.</strong> Review comments, a patient
+          thread with someone whose bug report started as a one-star
+          rating, and ended as the best issue of the quarter.</li>
+      <li><strong>2 hours code.</strong> Two of those hours were a fix
+          measured in lines. The other two were the CI config, again.</li>
+      <li><strong>1 hour regretting.</strong> Re-reading my own code from
+          2021 and choosing, deliberately, to understand it before
+          touching it.</li>
+    </ul>
+
+    <h2>What surprised me</h2>
+    <p>
+      The ratio. If you had asked me, I would have guessed 50/50 code
+      and everything else. The reality is that code is the garnish.
+      Maintenance is a reading comprehension problem wearing a
+      programming costume.
+    </p>
+    <p>
+      The other surprise: the highest-value hour of the three weeks was
+      writing two paragraphs into a README — the “when <em>not</em> to
+      use this” section. It has visibly cut down the mismatched-expectation
+      issues, which are the ones that drain you, because you cannot fix
+      them with a commit. You can only fix them with prose, in advance.
+    </p>
+
+    <h2>The one-star bug report</h2>
+    <p>
+      Worth recording, because I nearly handled it badly. It opened with
+      “doesn't work, garbage tool.” The pull on every maintainers' reflex
+      is to answer with a link to the issue template. I have written that
+      reply; it feels righteous and costs you a user and teaches you
+      nothing.
+    </p>
+    <p>
+      Instead I asked what they were trying to do. What they were trying
+      to do was reasonable, undocumented, and broken in a way I had never
+      considered — they were running the tool under a read-only
+      filesystem where the lock file could not be created. That is a
+      feature gap, not user error. It took one evening to support, and
+      the thread converted the angriest user I have had into the one who
+      now tests the release candidates.
+    </p>
+
+    <h2>Rules I wrote for myself afterwards</h2>
+    <ol>
+      <li>Log the hours for one week per quarter. The ratio of
+          reading-to-writing is the honest health metric of a project.</li>
+      <li>Every question answered twice by email becomes a documentation
+          paragraph the same week.</li>
+      <li>Angry first messages get one question back: “what are you
+          trying to do?” They are usually bug reports wearing armor.</li>
+      <li>Re-read before refactoring. Especially your own old code,
+          where familiarity lies hardest.</li>
+      <li>When a release is blocked on CI, time-box the yak to one hour
+          and then shave it instead.</li>
+    </ol>
+
+    <h2>Why publish this</h2>
+    <p>
+      Because “maintenance” has a PR problem. It sounds like nothing, it
+      photographs as nothing — there is no screenshot of nine hours of
+      reading — and yet it is the entire reason software is usable in
+      year three. The next time someone asks how the side project is
+      going, I am going to send them this post, and then get back to the
+      interesting part, which is reading.
+    </p>
+
+    <p class="post-footer-nav">
+      Next: <a href="/blog/cron-scheduling-gotchas/">Cron Scheduling Gotchas</a>.
+    </p>
+  </article>
+</main>
+
+<footer class="site-footer">
+  <p>© 2019–2026 Dario Kaufmann. Built by hand; no framework was harmed.</p>
+  <p><a href="/">Home</a> · <a href="/blog/">Blog</a> · <a href="/feed.xml">RSS</a> · <a href="mailto:hello@dario.kaufmann.dev">hello@dario.kaufmann.dev</a></p>
+</footer>
+
+</body>
+</html>
