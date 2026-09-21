@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 
 - - -
+## v1.7.0 - 2026-09-21
+#### Features
+- replace placeholder starter site with realistic multi-page blog - (b42d6ca) - Vyacheslav Egorov, *Codebuff*
+#### Miscellaneous Chores
+- bump tproxy-server submodule to upstream master (acc252e) - (328ecac) - Vyacheslav Egorov, *Codebuff*
+
+- - -
+
 ## v1.6.1 - 2026-09-05
 #### Bug Fixes
 - renew-cert.sh must run from the compose directory (#11) - (71e187f) - Vyacheslav Egorov, *root*
